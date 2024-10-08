@@ -1,2 +1,5 @@
 virt/
 *.pyc
+.DS_Store
+*.swp
+.vscode/
