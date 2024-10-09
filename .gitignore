@@ -1,2 +1,6 @@
 virt/
 *.pyc
+.DS_Store
+*.swp
+.vscode/
+__pycache__/
