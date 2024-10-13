@@ -1,5 +1,7 @@
 from django.shortcuts import render
-from django.http import HttpResponse
 
 def index(request):
-    return HttpResponse("Este es el sitio de administrador.")
+    return render(request, 'administrador.html')
+
+def admin_usuarios(request):
+    return render(request, 'admin_usuarios.html')
