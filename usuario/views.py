@@ -5,7 +5,8 @@ from django.shortcuts import render, redirect
 from django.contrib import messages  
 from django.urls import reverse
 from .forms import UserRegistrationForm
-from .models import Profile
+from .models import Usuario
+from django.contrib.auth.models import User
 
 def custom_login(request):
     if request.method == 'POST':
@@ -22,13 +23,7 @@ def custom_login(request):
 
 @login_required
 def welcome(request):
-    my_url = reverse('principal')
-    return render(request, my_url)  # Plantilla de bienvenida
-
-from django.shortcuts import render, redirect
-from django.contrib.auth.models import User
-from .forms import UserRegistrationForm
-from .models import Profile
+    return redirect(reverse('principal'))
 
 def register(request):
     if request.method == 'POST':
@@ -39,19 +34,9 @@ def register(request):
             if User.objects.filter(email=email).exists():
                 form.add_error('email', 'Este correo electrónico ya está en uso.')
             else:
-                user = form.save(commit=False)  # Guarda el usuario sin confirmar
-                user.save()  # Guarda el usuario en la base de datos
-                
-                # Crea el perfil
-                Profile.objects.create(
-                    user=user,
-                    nombre=form.cleaned_data['nombre'],
-                    apellidos=form.cleaned_data['apellidos'],
-                    nocuenta=form.cleaned_data['nocuenta'],
-                    carrera=form.cleaned_data['carrera']
-                )
-                return redirect('login')  # Redirige a la vista de inicio de sesión
+                user = form.save()
+                messages.success(request, 'Registro exitoso. Ahora puedes iniciar sesión.')
+                return redirect('login')
     else:
         form = UserRegistrationForm()
     return render(request, 'register.html', {'form': form})
-
