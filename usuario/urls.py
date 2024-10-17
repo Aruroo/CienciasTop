@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views  # Asegúrate de importar ambas vistas
+from . import views
 
 urlpatterns = [
    path('register/', views.register, name='register'),  # Ruta para la vista de registro
