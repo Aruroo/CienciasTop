@@ -39,6 +39,12 @@ class ProductoForm(forms.ModelForm):
         if dias < 3 or dias > 7:
             raise forms.ValidationError("Los días de préstamo deben ser de entre 3 y 7.")
         return dias
+    
+    def clean_costo(self):
+        costo = self.cleaned_data.get('costo')
+        if costo < 0:
+            raise forms.ValidationError("El precio no puede ser negativo.")
+        return costo
 
 
 
@@ -65,3 +71,9 @@ class EditarProductoForm(forms.ModelForm):
         if dias < 3 or dias > 7:
             raise forms.ValidationError("Los días de préstamo deben ser de entre 3 y 7.")
         return dias
+
+    def clean_costo(self):
+        costo = self.cleaned_data.get('costo')
+        if costo < 0:
+            raise forms.ValidationError("El precio no puede ser negativo.")
+        return costo
