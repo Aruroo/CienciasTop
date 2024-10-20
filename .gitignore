@@ -4,3 +4,4 @@ virt/
 *.swp
 .vscode/
 __pycache__/
+productos_imagenes/

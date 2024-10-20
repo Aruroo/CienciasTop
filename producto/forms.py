@@ -39,3 +39,29 @@ class ProductoForm(forms.ModelForm):
         if dias < 3 or dias > 7:
             raise forms.ValidationError("Los días de préstamo deben ser de entre 3 y 7.")
         return dias
+
+
+
+class EditarProductoForm(forms.ModelForm):
+    CATEGORIA_CHOICES = (
+        ('computadoras', 'Computadoras'),
+        ('tabletas', 'Tabletas'),
+        ('audifonos', 'Audifonos'),
+        ('peliculas', 'Peliculas'),
+        ('series', 'Series'),
+        ('cds', 'CDs'),
+        ('balones', 'Balones'),
+        ('raquetas', 'Raquetas'),
+        ('juegos', 'Juegos de mesa'),
+        ('otros', 'Otros')
+    )
+    categoria = forms.ChoiceField(label='Categoría', choices=CATEGORIA_CHOICES)
+    class Meta:
+        model = Producto
+        fields = ['nombre', 'costo', 'descripcion', 'categoria', 'dias']
+    
+    def clean_dias(self):
+        dias = self.cleaned_data.get('dias')
+        if dias < 3 or dias > 7:
+            raise forms.ValidationError("Los días de préstamo deben ser de entre 3 y 7.")
+        return dias
