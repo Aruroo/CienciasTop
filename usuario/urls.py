@@ -2,7 +2,12 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-   path('register/', views.register, name='register'),  # Ruta para la vista de registro
-    path('', views.custom_login, name='login'),  # Ruta para la vista de login
-    path('welcome/', views.welcome, name='welcome'),  # Ruta para la vista de bienvenida
+    path('', views.usuarios, name='usuarios'),
+    path('usuarios/registrar', views.registrar_usuario, name='registrar'),  # Ruta para la vista de registro
+    path('usuarios/editar', views.registrar_usuario, name='editar_u'),
+    path('eliminar/<int:nocuenta>', views.eliminar_usuario, name='eliminar_u'),
+    path('usuarios/editar/<int:nocuenta>', views.editar_usuario, name='editar_u'),
+    path('login/', views.custom_login, name='login'),  # Ruta para la vista de login
+    path('logout/', views.custom_logout, name='logout'), 
+    #path('welcome/', views.welcome, name='welcome'),  # Ruta para la vista de bienvenida
 ]
