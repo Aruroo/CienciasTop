@@ -27,6 +27,14 @@ class UserRegistrationForm(forms.ModelForm):
     
     area = forms.ChoiceField(label='Área', choices=AREA_CHOICES)
     
+    USER_CHOICES = [
+        ('administrador', 'Administrador'),
+        ('proveedor', 'Proveedor'),
+        ('usuario', 'Usuario'),
+    ]
+    
+    tipousuario = forms.ChoiceField(label='Tipo de Usuario', choices=USER_CHOICES)
+    
     # Campos del modelo User
     email = forms.EmailField(label='Correo Electrónico')
     password1 = forms.CharField(label='Contraseña', widget=forms.PasswordInput)
@@ -49,7 +57,7 @@ class UserRegistrationForm(forms.ModelForm):
     def save(self, commit=True):
         # Guardamos primero el usuario y luego el perfil
         user = User(
-            username=self.cleaned_data['email'],  # Usar el email como username
+            username=self.cleaned_data['nocuenta'],  # Usar el email como username
             email=self.cleaned_data['email']
         )
         user.set_password(self.cleaned_data['password1'])  # Establecer la contraseña
