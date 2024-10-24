@@ -12,6 +12,8 @@ def is_prov(user):
     return user.groups.filter(name='proveedor').exists()
 def is_prov_or_admin(user):
     return user.groups.filter(name='proveedor').exists() or user.groups.filter(name='administrador').exists()
+def is_user_c_or_admin(user):
+    return user.groups.filter(name='usuario_c').exists() or user.groups.filter(name='administrador').exists()
 
 #@login_required
 # def inicio(request):
@@ -67,14 +69,14 @@ def editar_producto(request, id):
     return render(request, 'editar_producto.html', {'form': form})
 
 @login_required
-@user_passes_test(is_prov)
+@user_passes_test(is_prov_or_admin)
 def eliminar_producto(request, id):
     libro = Producto.objects.get(id=id)
     libro.delete()
     return redirect('admin_productos')
 
 @login_required
-@user_passes_test(is_user_c)
+@user_passes_test(is_user_c_or_admin)
 def rentar_producto(request, id):
     usuario = request.user
     libro = Producto.objects.get(id=id)
