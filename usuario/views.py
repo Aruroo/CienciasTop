@@ -47,22 +47,19 @@ def registrar_usuario(request):
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data['email']
+            nocuenta = form.cleaned_data['nocuenta']
             # Verifica si el correo ya está en uso
+            if User.objects.filter(username=nocuenta).exists():
+                form.add_error('nocuenta', 'Este numero de cuenta ya está en uso.')
             if User.objects.filter(email=email).exists():
                 form.add_error('email', 'Este correo electrónico ya está en uso.')
             else:
                 user = form.save(commit=False)  # Guarda el usuario sin confirmar
-                user.save()  # Guarda el usuario en la base de datos
+                #user.save()  # Guarda el usuario en la base de datos
                 user.username = form.cleaned_data['nocuenta']
-                user.save()  # Guarda el usuario en la base de datos
-                if form.cleaned_data['tipousuario'] == 'proveedor':
-                    add_to_group = Group.objects.get(name='proveedor')
-                elif form.cleaned_data['tipousuario'] == 'admin':
-                    add_to_group = Group.objects.get(name='administrador')
-                else:
-                    add_to_group = Group.objects.get(name='usuario_c')
-                add_to_group.user_set.add(user)
-                add_to_group.save()
+                #user.save()  # Guarda el usuario en la base de datos
+                
+                #add_to_group.save()
                 
                 # Crea el perfil
                 # Usuario.objects.create(
@@ -76,6 +73,17 @@ def registrar_usuario(request):
                 #     email=form.cleaned_data['email'],
                 # )
                 user = form.save()
+                
+                
+                if form.cleaned_data['tipousuario'] == 'proveedor':
+                    add_to_group = Group.objects.get(name='proveedor')
+                elif form.cleaned_data['tipousuario'] == 'admin':
+                    add_to_group = Group.objects.get(name='administrador')
+                else:
+                    add_to_group = Group.objects.get(name='usuario_c')
+                add_to_group.user_set.add(user)
+                
+                add_to_group.save()
                 messages.success(request, 'Registro exitoso. Ahora puedes iniciar sesión.')
                 return redirect('login')
     else:
