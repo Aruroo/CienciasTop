@@ -22,14 +22,14 @@ def is_user_c_or_admin(user):
 # Productos
 @login_required
 def productos(request):
-    productos = Producto.objects.all()
+    productos_rentados = Renta.objects.all()
+    productos = Producto.objects.exclude(renta__in=productos_rentados)
     return render(request, 'productos/index.html', {'productos': productos})
 
 @login_required
 @user_passes_test(is_prov_or_admin)
 def admin_producto(request):
     user = request.user
-    print("usuario: ", user)
     if user.groups.filter(name='proveedor').exists():
         productos = Producto.objects.all().filter(user=user)
     else:
