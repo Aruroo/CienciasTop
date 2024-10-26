@@ -77,7 +77,7 @@ def registrar_usuario(request):
                 
                 if form.cleaned_data['tipousuario'] == 'proveedor':
                     add_to_group = Group.objects.get(name='proveedor')
-                elif form.cleaned_data['tipousuario'] == 'admin':
+                elif form.cleaned_data['tipousuario'] == 'administrador':
                     add_to_group = Group.objects.get(name='administrador')
                 else:
                     add_to_group = Group.objects.get(name='usuario_c')
