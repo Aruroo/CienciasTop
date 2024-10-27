@@ -3,10 +3,10 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import Group
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages  
 #from django.urls import reverse
-from .forms import UserRegistrationForm
+from .forms import UserEditForm, UserRegistrationForm
 from .models import Usuario
 
 def is_admin(user):
@@ -71,7 +71,7 @@ def registrar_usuario(request):
                 add_to_group.user_set.add(user)
                 add_to_group.save()
 
-                messages.success(request, 'Registro exitoso. Ahora el usuario puede iniciar sesión.')
+                messages.success(request, 'Acción exitosa.')
                 return redirect('usuarios')
     else:
         form = UserRegistrationForm()
@@ -89,12 +89,32 @@ def usuarios(request):
 @login_required
 @user_passes_test(is_admin)
 def editar_usuario(request, nocuenta):
-    usuario = Usuario.objects.get(nocuenta=nocuenta)
-    formulario = UserRegistrationForm(request.POST or None, request.FILES or None, instance=usuario)
-    if formulario.is_valid() and request.POST:
-        formulario.save()
-        return redirect('usuarios')
-    return render(request, 'usuarios/editar.html', {'formulario':formulario})
+    usuario = get_object_or_404(Usuario, nocuenta=nocuenta)
+    if request.method == 'POST':
+        formulario = UserEditForm(request.POST, instance=usuario)
+        if formulario.is_valid():
+            # Guardar los datos del usuario
+            formulario.save()
+            tipousuario = formulario.cleaned_data['tipousuario']
+            user = usuario.user
+
+            # Limpiar los grupos actuales del usuario
+            user.groups.clear()
+
+            # Agregar el usuario al nuevo grupo según el tipo de usuario
+            if tipousuario == 'proveedor':
+                add_to_group = Group.objects.get(name='proveedor')
+            elif tipousuario == 'administrador':
+                add_to_group = Group.objects.get(name='administrador')
+            else:
+                add_to_group = Group.objects.get(name='usuario_c')
+
+            user.groups.add(add_to_group)  # Agrega el usuario al nuevo grupo
+            return redirect('usuarios')
+    else:
+        formulario = UserEditForm(instance=usuario)
+
+    return render(request, 'usuarios/editar.html', {'formulario': formulario, 'usuario':usuario})
 
 @login_required
 @user_passes_test(is_admin)

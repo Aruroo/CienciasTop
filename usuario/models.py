@@ -16,3 +16,6 @@ class Usuario(models.Model):
 
     def __str__(self):
         return f"{self.nombre} {self.apellidopaterno} {self.apellidomaterno}"
+    
+    def get_group_display(self):
+        return ', '.join([group.name for group in self.user.groups.all()])  # Devuelve los grupos del usuario

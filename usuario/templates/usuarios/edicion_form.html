@@ -1,0 +1,81 @@
+<form enctype="multipart/form-data" method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label class="form-label">Rol actual:</label>
+        <span class="form-text">{{ usuario.get_group_display }}</span>
+    </div>
+    
+    <div class="mb-3 form-check">
+        <input type="checkbox" id="toggleTipousuario" class="form-check-input">
+        <br>
+        <label class="form-label">¿Editar tipo de usuario? El rol de los usuarios es delicado</label>
+    </div>
+
+    <div id="tipousuarioContainer" style="display:none;" class="mb-3">
+        <label for="id_tipousuario" class="form-label">{{ formulario.tipousuario.label }}</label>
+        {{ formulario.tipousuario }}  {# Renderiza el ChoiceField directamente #}
+    </div>
+
+    {% for campo in formulario %}
+        {% if campo.name != 'tipousuario' %}  {# Excluye el campo tipousuario del loop #}
+        <div class="mb-3">
+            <label for="{{ campo.id_for_label }}" class="form-label">{{ campo.label }}</label>
+            {% if campo.field.widget.input_type == 'select' %}
+                {{ campo }}  {# Renderiza select si es un ChoiceField #}
+            {% else %}
+                <input
+                    type="{{ campo.field.widget.input_type }}"
+                    class="form-control"
+                    name="{{ campo.name }}"
+                    id="{{ campo.id_for_label }}"
+                    aria-describedby="helpId"
+                    placeholder="{{ campo.label }}"
+                    value="{{ campo.value|default:'' }}"
+                />
+            {% endif %}
+        </div>
+        <div class="col-12 help-text"> {{ campo.errors }} </div>
+        {% endif %}
+    {% endfor %}
+
+    <input
+        name=""
+        id=""
+        class="btn btn-success"
+        type="submit"
+        value="Enviar"
+    />
+    <a
+        name=""
+        id=""
+        class="btn btn-primary"
+        href="{% url 'usuarios' %}"
+        role="button"
+    >Cancelar</a>
+</form>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const toggleTipousuario = document.getElementById('toggleTipousuario');
+        const tipousuarioContainer = document.getElementById('tipousuarioContainer');
+    
+        function toggleTipousuarioField() {
+            if (toggleTipousuario.checked) {
+                tipousuarioContainer.style.display = 'block';
+            } else {
+                tipousuarioContainer.style.display = 'none';
+            }
+        }
+    
+        // Llamar a la función en el inicio y cuando cambie el estado del interruptor
+        toggleTipousuarioField();
+        toggleTipousuario.addEventListener('change', toggleTipousuarioField);
+    });
+    </script>
+
+<style>
+    .form-check {
+        display: flex;
+        align-items: center;
+        margin-right: 10px;
+    }
+</style>

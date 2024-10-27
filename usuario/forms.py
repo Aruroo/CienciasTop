@@ -133,3 +133,60 @@ class UserRegistrationForm(forms.ModelForm):
         if commit:
             usuario.save()
         return user
+
+class UserEditForm(forms.ModelForm):
+    # Campos editables
+    USER_CHOICES = [
+        ('administrador', 'Administrador'),
+        ('proveedor', 'Proveedor'),
+        ('usuario', 'Usuario'),
+    ]
+    
+    tipousuario = forms.ChoiceField(label='Tipo de Usuario', choices=USER_CHOICES)
+    nombre = forms.CharField(label='Nombre', max_length=40)
+    apellidopaterno = forms.CharField(label='Apellido paterno', max_length=40)
+    apellidomaterno = forms.CharField(label='Apellido materno', max_length=40)
+    celular = PhoneNumberField(label='Número de teléfono')
+    email = forms.EmailField(label='Correo Electrónico')
+    puntos = forms.IntegerField(label='Puntos')
+    
+    class Meta:
+        model = Usuario
+        fields = ['tipousuario', 'nombre', 'apellidopaterno', 'apellidomaterno', 'celular', 'email', 'puntos']
+
+    def clean_nombre(self):
+        nombre = self.cleaned_data.get('nombre')
+        if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$', nombre):
+            raise ValidationError("El nombre solo puede contener letras y espacios.")
+        return nombre
+
+    def clean_apellidopaterno(self):
+        apellidopaterno = self.cleaned_data.get('apellidopaterno')
+        if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$', apellidopaterno):
+            raise ValidationError("El apellido paterno solo puede contener letras y espacios.")
+        return apellidopaterno
+
+    def clean_apellidomaterno(self):
+        apellidomaterno = self.cleaned_data.get('apellidomaterno')
+        if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$', apellidomaterno):
+            raise ValidationError("El apellido materno solo puede contener letras y espacios.")
+        return apellidomaterno
+    
+    def clean_puntos(self):
+        puntos = self.cleaned_data.get('puntos')
+        if puntos < 0:
+            raise ValidationError("Los puntos no pueden ser negativos.")
+        return puntos
+
+    def save(self, commit=True):
+        usuario = super().save(commit=False)
+        tipousuario = self.cleaned_data.get('tipousuario')
+        if tipousuario in ['administrador', 'proveedor']:
+            usuario.area = 'trabajador'
+        if commit:
+            usuario.save()
+            user = usuario.user  # Obtener el objeto User relacionado
+            user.email = self.cleaned_data['email']
+            user.save()  # Guardar el objeto User actualizado
+
+        return usuario
