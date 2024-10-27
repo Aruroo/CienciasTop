@@ -90,26 +90,33 @@ def usuarios(request):
 @user_passes_test(is_admin)
 def editar_usuario(request, nocuenta):
     usuario = get_object_or_404(Usuario, nocuenta=nocuenta)
+    user = usuario.user  # Obtenemos el usuario relacionado
+
     if request.method == 'POST':
         formulario = UserEditForm(request.POST, instance=usuario)
         if formulario.is_valid():
-            # Guardar los datos del usuario
             formulario.save()
-            tipousuario = formulario.cleaned_data['tipousuario']
-            user = usuario.user
 
-            # Limpiar los grupos actuales del usuario
-            user.groups.clear()
+            # Verifica si el checkbox para cambiar el tipo de usuario está activado
+            if request.POST.get('toggleTipousuario') == '1':
+                # Recupera el tipo de usuario del formulario solo si fue cambiado
+                nuevo_tipousuario = formulario.cleaned_data.get('tipousuario')
+                grupo_actual = user.groups.first().name if user.groups.exists() else None
 
-            # Agregar el usuario al nuevo grupo según el tipo de usuario
-            if tipousuario == 'proveedor':
-                add_to_group = Group.objects.get(name='proveedor')
-            elif tipousuario == 'administrador':
-                add_to_group = Group.objects.get(name='administrador')
-            else:
-                add_to_group = Group.objects.get(name='usuario_c')
+                # Cambia el grupo solo si el nuevo tipo de usuario es diferente al actual
+                if nuevo_tipousuario and nuevo_tipousuario != grupo_actual:
+                    user.groups.clear()  # Limpia el grupo actual
+                    
+                    # Asigna el nuevo grupo basado en el valor de `nuevo_tipousuario`
+                    if nuevo_tipousuario == 'proveedor':
+                        add_to_group = Group.objects.get(name='proveedor')
+                    elif nuevo_tipousuario == 'administrador':
+                        add_to_group = Group.objects.get(name='administrador')
+                    else:
+                        add_to_group = Group.objects.get(name='usuario_c')
+                    
+                    add_to_group.user_set.add(user)  # Asigna el nuevo grupo
 
-            user.groups.add(add_to_group)  # Agrega el usuario al nuevo grupo
             return redirect('usuarios')
     else:
         formulario = UserEditForm(instance=usuario)

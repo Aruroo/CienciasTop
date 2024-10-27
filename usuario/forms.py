@@ -142,17 +142,19 @@ class UserEditForm(forms.ModelForm):
         ('usuario', 'Usuario'),
     ]
     
-    tipousuario = forms.ChoiceField(label='Tipo de Usuario', choices=USER_CHOICES)
+    tipousuario = forms.ChoiceField(label='Tipo de Usuario', choices=USER_CHOICES, required=False)
     nombre = forms.CharField(label='Nombre', max_length=40)
     apellidopaterno = forms.CharField(label='Apellido paterno', max_length=40)
     apellidomaterno = forms.CharField(label='Apellido materno', max_length=40)
     celular = PhoneNumberField(label='Número de teléfono')
     email = forms.EmailField(label='Correo Electrónico')
     puntos = forms.IntegerField(label='Puntos')
+    password = forms.CharField(label='Nueva contraseña', widget=forms.PasswordInput, required=False)
+    password2 = forms.CharField(label='Confirma tu contraseña', widget=forms.PasswordInput, required=False)
     
     class Meta:
         model = Usuario
-        fields = ['tipousuario', 'nombre', 'apellidopaterno', 'apellidomaterno', 'celular', 'email', 'puntos']
+        fields = ['tipousuario', 'nombre', 'apellidopaterno', 'apellidomaterno', 'celular', 'email', 'puntos', 'password', 'password2']
 
     def clean_nombre(self):
         nombre = self.cleaned_data.get('nombre')
@@ -177,16 +179,34 @@ class UserEditForm(forms.ModelForm):
         if puntos < 0:
             raise ValidationError("Los puntos no pueden ser negativos.")
         return puntos
+    
+    def clean_password2(self):
+        # Validación de las contraseñas
+        password = self.cleaned_data.get('password')
+        password2 = self.cleaned_data.get('password2')
+
+        if password and password2 and password != password2:
+            raise ValidationError("Las contraseñas no coinciden.")
+
+        return password2
 
     def save(self, commit=True):
         usuario = super().save(commit=False)
         tipousuario = self.cleaned_data.get('tipousuario')
+        password = self.cleaned_data.get('password')
+        # Verificar si el campo 'tipousuario' requiere un cambio en 'area'
         if tipousuario in ['administrador', 'proveedor']:
             usuario.area = 'trabajador'
+
         if commit:
-            usuario.save()
-            user = usuario.user  # Obtener el objeto User relacionado
+            usuario.save()  # Guardar cambios en el modelo Usuario
+            user = usuario.user
             user.email = self.cleaned_data['email']
-            user.save()  # Guardar el objeto User actualizado
+
+            # Cambiar la contraseña solo si se proporciona una nueva
+            if password:
+                user.set_password(password)
+
+            user.save()
 
         return usuario
