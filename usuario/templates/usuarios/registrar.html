@@ -19,5 +19,25 @@
     </ul>
     {% endif %}
 
-</body>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const tipousuarioField = document.getElementById('id_tipousuario');
+        const areaField = document.getElementById('id_area');
+
+        function toggleAreaField() {
+            if (tipousuarioField.value === 'usuario') {
+                areaField.closest('p').style.display = 'block';
+            } else {
+                areaField.closest('p').style.display = 'none';
+                areaField.value = '';  // Limpiar el valor si no es usuario
+            }
+        }
+
+        // Llamar a la función en el inicio y cuando cambie el valor de tipousuario
+        toggleAreaField();
+        tipousuarioField.addEventListener('change', toggleAreaField);
+    });
+    </script>
+
+</body>    
 </html>

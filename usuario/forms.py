@@ -4,9 +4,18 @@ from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 from phonenumber_field.formfields import PhoneNumberField
 from .models import Usuario
+import re
 
 class UserRegistrationForm(forms.ModelForm):
     # Campos relacionados con el perfil del usuario (modelo Usuario)
+
+    USER_CHOICES = [
+        ('administrador', 'Administrador'),
+        ('proveedor', 'Proveedor'),
+        ('usuario', 'Usuario'),
+    ]
+    
+    tipousuario = forms.ChoiceField(label='Tipo de Usuario', choices=USER_CHOICES)
     nombre = forms.CharField(label='Nombre', max_length=40)
     apellidopaterno = forms.CharField(label='Apellido paterno', max_length=40)
     apellidomaterno = forms.CharField(label='Apellido materno', max_length=40)
@@ -25,21 +34,16 @@ class UserRegistrationForm(forms.ModelForm):
         ('trabajador', 'Trabajador'),
     ]
     
-    area = forms.ChoiceField(label='Área', choices=AREA_CHOICES)
-    
-    USER_CHOICES = [
-        ('administrador', 'Administrador'),
-        ('proveedor', 'Proveedor'),
-        ('usuario', 'Usuario'),
-    ]
-    
-    tipousuario = forms.ChoiceField(label='Tipo de Usuario', choices=USER_CHOICES)
+    area = forms.ChoiceField(label='Área', choices=AREA_CHOICES, required=False)
     
     # Campos del modelo User
     email = forms.EmailField(label='Correo Electrónico')
     password1 = forms.CharField(label='Contraseña', widget=forms.PasswordInput)
     password2 = forms.CharField(label='Confirma tu contraseña', widget=forms.PasswordInput)
-
+    
+    # Orden de los campos
+    field_order = ['tipousuario', 'area', 'nombre', 'apellidopaterno', 'apellidomaterno', 
+                   'celular', 'nocuenta', 'email', 'password1', 'password2']
     class Meta:
         model = Usuario
         fields = ['nombre', 'apellidopaterno', 'apellidomaterno', 'celular', 'nocuenta', 'area', 'email', 'password1', 'password2']
@@ -53,6 +57,57 @@ class UserRegistrationForm(forms.ModelForm):
             raise ValidationError("Las contraseñas no coinciden.")
         
         return password2
+    def clean_nombre(self):
+        nombre = self.cleaned_data.get('nombre')
+        if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$', nombre):
+            raise ValidationError("El nombre solo puede contener letras y espacios.")
+        return nombre
+
+    def clean_apellidopaterno(self):
+        apellidopaterno = self.cleaned_data.get('apellidopaterno')
+        if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$', apellidopaterno):
+            raise ValidationError("El apellido paterno solo puede contener letras y espacios.")
+        return apellidopaterno
+
+    def clean_apellidomaterno(self):
+        apellidomaterno = self.cleaned_data.get('apellidomaterno')
+        if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$', apellidomaterno):
+            raise ValidationError("El apellido materno solo puede contener letras y espacios.")
+        return apellidomaterno
+    
+    def clean_nocuenta(self):
+        nocuenta = self.cleaned_data.get('nocuenta')
+        mensaje = "El número de cuenta debe ser de 6 dígitos para trabajadores o de 9 dígitos para alumnos."
+        # Verifica que nocuenta solo contenga dígitos
+        if not nocuenta.isdigit():
+            raise ValidationError(mensaje)
+        # Verifica que nocuenta tenga una longitud válida
+        if len(nocuenta) not in [6, 9]:
+            raise ValidationError(mensaje)
+        return nocuenta
+
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        tipousuario = cleaned_data.get('tipousuario')
+        area = cleaned_data.get('area')
+        nocuenta = cleaned_data.get('nocuenta')
+    
+        # Validar que 'Área' solo se seleccione cuando el tipo de usuario es 'usuario'
+        if tipousuario != 'usuario' and area:
+            raise ValidationError("El campo 'Área' solo debe estar seleccionado cuando el tipo de usuario es 'usuario'.")
+    
+        # Si nocuenta tiene 6 dígitos, 'Área' debe ser 'trabajador'
+        if len(nocuenta) == 6 and area != 'trabajador':
+            raise ValidationError("Si el número de cuenta es de 6 dígitos, el área debe ser 'trabajador'.")
+    
+        # Si nocuenta tiene 9 dígitos, 'Área' no debe ser 'trabajador'
+        if len(nocuenta) == 9 and area == 'trabajador':
+            raise ValidationError("Si el número de cuenta es de 9 dígitos, el área no debe ser 'trabajador'.")
+    
+        return cleaned_data
+
+
 
     def save(self, commit=True):
         # Guardamos primero el usuario y luego el perfil
