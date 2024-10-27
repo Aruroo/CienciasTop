@@ -3,10 +3,10 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import Group
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages  
 #from django.urls import reverse
-from .forms import UserRegistrationForm
+from .forms import UserEditForm, UserRegistrationForm
 from .models import Usuario
 
 def is_admin(user):
@@ -17,7 +17,7 @@ def custom_login(request):
         #email = request.POST['email']
         no_cuenta = request.POST['username']
         password = request.POST['password']
-        # Autenticar al usuario usando el correo electrónico
+        # Autenticar al usuario usando el username (numero de cuenta)
         user = authenticate(request, username=no_cuenta, password=password)
         if user is not None:
             login(request, user)
@@ -39,7 +39,6 @@ def custom_logout(request):
 # @login_required
 # def welcome(request):
 #     return redirect(reverse('principal'))
-
 @login_required
 @user_passes_test(is_admin)
 def registrar_usuario(request):
@@ -48,68 +47,80 @@ def registrar_usuario(request):
         if form.is_valid():
             email = form.cleaned_data['email']
             nocuenta = form.cleaned_data['nocuenta']
-            # Verifica si el correo ya está en uso
+            # Verificación de duplicados para nocuenta y email
             if User.objects.filter(username=nocuenta).exists():
-                form.add_error('nocuenta', 'Este numero de cuenta ya está en uso.')
-            if User.objects.filter(email=email).exists():
+                form.add_error('nocuenta', 'Este número de cuenta ya está en uso.')
+            elif User.objects.filter(email=email).exists():
                 form.add_error('email', 'Este correo electrónico ya está en uso.')
             else:
-                user = form.save(commit=False)  # Guarda el usuario sin confirmar
-                #user.save()  # Guarda el usuario en la base de datos
-                user.username = form.cleaned_data['nocuenta']
-                #user.save()  # Guarda el usuario en la base de datos
-                
-                #add_to_group.save()
-                
-                # Crea el perfil
-                # Usuario.objects.create(
-                #     user=user,
-                #     nombre=form.cleaned_data['nombre'],
-                #     apellidopaterno=form.cleaned_data['apellidopaterno'],
-                #     apellidomaterno=form.cleaned_data['apellidomaterno'],
-                #     celular=form.cleaned_data['celular'],
-                #     nocuenta=form.cleaned_data['nocuenta'],
-                #     area=form.cleaned_data['area'],
-                #     email=form.cleaned_data['email'],
-                # )
+                # Guardar el usuario sin duplicar llamadas a form.save()
+                user = form.save(commit=False)
+                user.username = nocuenta
                 user = form.save()
-                
-                
-                if form.cleaned_data['tipousuario'] == 'proveedor':
+
+                # Asignación de grupo según tipo de usuario
+                tipousuario = form.cleaned_data['tipousuario']
+                if tipousuario == 'proveedor':
                     add_to_group = Group.objects.get(name='proveedor')
-                elif form.cleaned_data['tipousuario'] == 'administrador':
+                elif tipousuario == 'administrador':
                     add_to_group = Group.objects.get(name='administrador')
                 else:
                     add_to_group = Group.objects.get(name='usuario_c')
+
+                # Agregar el usuario al grupo y guardar
                 add_to_group.user_set.add(user)
-                
                 add_to_group.save()
-                messages.success(request, 'Registro exitoso. Ahora puedes iniciar sesión.')
-                return redirect('login')
+
+                messages.success(request, 'Acción exitosa.')
+                return redirect('usuarios')
     else:
         form = UserRegistrationForm()
     return render(request, 'usuarios/registrar.html', {'form': form})
 
 
+
 @login_required
 @user_passes_test(is_admin)
 def usuarios(request):
-    usuarios = Usuario.objects.all()
+    # Solo aquellos que no estan ocultos
+    usuarios = Usuario.objects.filter(oculto=False)
     return render(request, 'usuarios/index.html', {'usuarios': usuarios})
 
 @login_required
 @user_passes_test(is_admin)
 def editar_usuario(request, nocuenta):
-    usuario = Usuario.objects.get(nocuenta=nocuenta)
-    formulario = UserRegistrationForm(request.POST or None, request.FILES or None, instance=usuario)
-    if formulario.is_valid() and request.POST:
-        formulario.save()
-        return redirect('usuarios')
-    return render(request, 'usuarios/editar.html', {'formulario':formulario})
+    usuario = get_object_or_404(Usuario, nocuenta=nocuenta)
+    if request.method == 'POST':
+        formulario = UserEditForm(request.POST, instance=usuario)
+        if formulario.is_valid():
+            # Guardar los datos del usuario
+            formulario.save()
+            tipousuario = formulario.cleaned_data['tipousuario']
+            user = usuario.user
+
+            # Limpiar los grupos actuales del usuario
+            user.groups.clear()
+
+            # Agregar el usuario al nuevo grupo según el tipo de usuario
+            if tipousuario == 'proveedor':
+                add_to_group = Group.objects.get(name='proveedor')
+            elif tipousuario == 'administrador':
+                add_to_group = Group.objects.get(name='administrador')
+            else:
+                add_to_group = Group.objects.get(name='usuario_c')
+
+            user.groups.add(add_to_group)  # Agrega el usuario al nuevo grupo
+            return redirect('usuarios')
+    else:
+        formulario = UserEditForm(instance=usuario)
+
+    return render(request, 'usuarios/editar.html', {'formulario': formulario, 'usuario':usuario})
 
 @login_required
 @user_passes_test(is_admin)
-def eliminar_usuario(request, id):
-    usuario = Usuario.objects.get(id=id)
-    usuario.delete()
+def eliminar_usuario(request, nocuenta):
+    usuario = Usuario.objects.get(nocuenta=nocuenta)
+    #En realidad, solo oculta a los usuarios, pero no se eliminan
+    usuario.oculto = True
+    usuario.save()
     return redirect('usuarios')

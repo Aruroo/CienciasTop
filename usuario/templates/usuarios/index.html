@@ -23,11 +23,12 @@
             >
                 <thead>
                     <tr>
-                        <th scope="col">User</th>
+                        <th scope="col">No.Cuenta</th>
                         <th scope="col">Nombre</th>
-                        <th scope="col">Apellidos</th>
-                        <th scope="col">No Cuenta </th>
-                        <th scope="col">Carrera </th>
+                        <th scope="col">Apellido P</th>
+                        <th scope="col">Apellido M</th>
+                        <th scope="col">Area </th>
+                        <th scope="col">Rol </th>
                         <th scope="col">Acciones</th>
                     </tr>
                 </thead>
@@ -35,11 +36,12 @@
                     {% for usuario in usuarios %}
                         
                         <tr class="">
-                            <td scope="row"> {{usuario.user}} </td>
+                            <td scope="row"> {{usuario.nocuenta}} </td>
                             <td>{{usuario.nombre}}</td>
-                            <td>{{usuario.apellidos}}</td>
-                            <td>{{usuario.nocuenta}}</td>
-                            <td>{{usuario.carrera}}</td>
+                            <td>{{usuario.apellidopaterno}}</td>
+                            <td>{{usuario.apellidomaterno}}</td>
+                            <td>{{usuario.area}}</td>
+                            <td>{{usuario.get_group_display}}</td>
                             <td> <a
                                 name=""
                                 id=""
@@ -69,3 +71,11 @@
 </div>
 
 {% endblock %}
+
+{% if messages %}
+    <ul>
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}

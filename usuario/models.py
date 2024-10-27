@@ -10,8 +10,12 @@ class Usuario(models.Model):
     puntos = models.IntegerField(default=100)
     celular = PhoneNumberField()
     nocuenta = models.CharField(max_length=9)
-    area = models.CharField(max_length=100)
+    area = models.CharField(max_length=100, default='trabajador')
     email = models.EmailField()
+    oculto = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.nombre} {self.apellidopaterno} {self.apellidomaterno}"
+    
+    def get_group_display(self):
+        return ', '.join([group.name for group in self.user.groups.all()])  # Devuelve los grupos del usuario
