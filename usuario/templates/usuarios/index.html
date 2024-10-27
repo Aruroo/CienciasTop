@@ -56,8 +56,9 @@
                                 class="btn btn-danger"
                                 href="{% url 'eliminar_u' usuario.nocuenta %}"
                                 role="button"
+                                onclick="return confirmarEliminacion()"
                                 >Borrar</a>
-                            
+
                              </td>
                         </tr>
                         
@@ -69,6 +70,13 @@
     </div>
     <div class="card-footer text-muted">Footer</div>
 </div>
+
+<script>
+    function confirmarEliminacion() {
+        return confirm("¿Estás seguro de que deseas eliminar este usuario?");
+    }
+</script>
+
 
 {% endblock %}
 
