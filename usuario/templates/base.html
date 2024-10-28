@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Registro{% endblock %}</title>
+    <style>
+        /* Estilo para el encabezado azul */
+        header {
+            background-color: #007bff; /* Color azul */
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h2>{% block header %}Bienvenido{% endblock %}</h2>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>© 2024 Mi Sitio Web</p>
+    </footer>
+</body>
+</html>
