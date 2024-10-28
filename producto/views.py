@@ -28,23 +28,32 @@ def productos(request):
     
     is_usuario_c = request.user.groups.filter(name='usuario_c').exists()
     is_adminn = request.user.groups.filter(name='administrador').exists()
-    
+    is_prov = request.user.groups.filter(name='proveedor').exists()
+
     # Pasar la información de productos y el estado del grupo al contexto
     return render(request, 'productos/index.html', {
         'productos': productos,
         'is_usuario_c': is_usuario_c,
+        'is_prov': is_prov,
         'is_adminn': is_adminn
     })
 
 @login_required
 @user_passes_test(is_prov_or_admin)
 def admin_producto(request):
+    is_usuario_c = request.user.groups.filter(name='usuario_c').exists()
+    is_adminn = request.user.groups.filter(name='administrador').exists()
+    is_prov = request.user.groups.filter(name='proveedor').exists()
+
     user = request.user
     if user.groups.filter(name='proveedor').exists():
         productos = Producto.objects.all().filter(user=user)
     else:
         productos = Producto.objects.all()
-    return render(request, 'productos/index_admin.html', {'productos': productos})
+    return render(request, 'productos/index_admin.html', {'productos': productos,
+        'is_usuario_c': is_usuario_c,
+        'is_prov': is_prov,
+        'is_adminn': is_adminn})
 
 @login_required
 @user_passes_test(is_prov_or_admin)

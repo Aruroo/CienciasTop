@@ -1,4 +1,4 @@
-{% load static %}
+	{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -36,7 +36,7 @@
                     <a class="nav-link" href="{% url 'admin_productos' %}">Administrar Productos</a>
                 </li>
                 {% endif %}
-                {% if is_adminn %}
+                {% if not is_usuario_c and not is_prov %}
                 <li class="nav-item ">
                     <a class="nav-link" href="{% url 'usuarios' %}">Administrar Usuarios</a>
                 </li>
