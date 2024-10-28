@@ -92,24 +92,32 @@ class UserRegistrationForm(forms.ModelForm):
         tipousuario = cleaned_data.get('tipousuario')
         area = cleaned_data.get('area')
         nocuenta = cleaned_data.get('nocuenta')
-    
+
         # Validar que 'Área' solo se seleccione cuando el tipo de usuario es 'usuario'
         if tipousuario != 'usuario' and area:
             raise ValidationError("El campo 'Área' solo debe estar seleccionado cuando el tipo de usuario es 'usuario'.")
     
+        if nocuenta is None:
+            raise ValidationError("El campo 'Número de Cuenta' debe de ser un número entero.")
+
         # Si nocuenta tiene 6 dígitos, 'Área' debe ser 'trabajador'
         if len(nocuenta) == 6 and area != 'trabajador':
-            raise ValidationError("Si el número de cuenta es de 6 dígitos, el área debe ser 'trabajador'.")
+            if not tipousuario in ['administrador', 'proveedor']:    
+                raise ValidationError("Si el número de cuenta es de 6 dígitos, el área debe ser 'trabajador'.")
     
         # Si nocuenta tiene 9 dígitos, 'Área' no debe ser 'trabajador'
         if len(nocuenta) == 9 and area == 'trabajador':
             raise ValidationError("Si el número de cuenta es de 9 dígitos, el área no debe ser 'trabajador'.")
-    
+        
         return cleaned_data
 
 
 
     def save(self, commit=True):
+        # Para no guardar valores nulos, si el tipousuario es administrador
+        # o proveedor, se le asigna un valor por defecto a area
+        if self.cleaned_data['tipousuario'] in ['administrador', 'proveedor']:
+            self.cleaned_data['area'] = 'trabajador'
         # Guardamos primero el usuario y luego el perfil
         user = User(
             username=self.cleaned_data['nocuenta'],  # Usar el email como username
