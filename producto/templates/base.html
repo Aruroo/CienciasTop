@@ -1,4 +1,4 @@
-{% load static %}
+	{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -31,17 +31,19 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'productos' %}">Productos disponibles</a>
                 </li>
+                {% if not is_usuario_c %}
                 <li class="nav-item ">
                     <a class="nav-link" href="{% url 'admin_productos' %}">Administrar Productos</a>
                 </li>
+                {% endif %}
+                {% if not is_usuario_c and not is_prov %}
                 <li class="nav-item ">
                     <a class="nav-link" href="{% url 'usuarios' %}">Administrar Usuarios</a>
                 </li>
+                {% endif %}
                 <li class="nav-item active">
-                    <a class="nav-link" href="{% url 'logout' %}">cerrar sesión</a>
-
+                    <a class="nav-link" href="{% url 'logout' %}">Cerrar sesión</a>
                 </li>
-
             </ul>
         </div>
     </nav>
