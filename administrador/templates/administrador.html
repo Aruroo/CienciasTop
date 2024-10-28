@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8"> 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Administrador</title>
 </head>
@@ -10,8 +10,11 @@
     <p>TODO: Enlistar productos</p>
     <p>TODO: Header</p>
     <p>TODO: Footer</p>
-    <button onclick="window.location.href = '{% url 'admin_usuarios' %}';">
-        Administrar usuarios
-    </button>
+
+    {% if user.is_authenticated and user.groups.filter(name='administrador').exists %} 
+        <button onclick="window.location.href = '{% url 'admin_usuarios' %}';">
+            Administrar usuarios
+        </button>
+    {% endif %}
 </body>
 </html>

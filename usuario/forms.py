@@ -92,11 +92,14 @@ class UserRegistrationForm(forms.ModelForm):
         tipousuario = cleaned_data.get('tipousuario')
         area = cleaned_data.get('area')
         nocuenta = cleaned_data.get('nocuenta')
-    
+
         # Validar que 'Área' solo se seleccione cuando el tipo de usuario es 'usuario'
         if tipousuario != 'usuario' and area:
             raise ValidationError("El campo 'Área' solo debe estar seleccionado cuando el tipo de usuario es 'usuario'.")
     
+        if nocuenta is None:
+            raise ValidationError("El campo 'Número de Cuenta' debe de ser un número entero.")
+
         # Si nocuenta tiene 6 dígitos, 'Área' debe ser 'trabajador'
         if len(nocuenta) == 6 and area != 'trabajador':
             raise ValidationError("Si el número de cuenta es de 6 dígitos, el área debe ser 'trabajador'.")
@@ -104,7 +107,7 @@ class UserRegistrationForm(forms.ModelForm):
         # Si nocuenta tiene 9 dígitos, 'Área' no debe ser 'trabajador'
         if len(nocuenta) == 9 and area == 'trabajador':
             raise ValidationError("Si el número de cuenta es de 9 dígitos, el área no debe ser 'trabajador'.")
-    
+        
         return cleaned_data
 
 

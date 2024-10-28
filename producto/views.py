@@ -22,9 +22,19 @@ def is_user_c_or_admin(user):
 # Productos
 @login_required
 def productos(request):
+    # Obtener todos los productos que están rentados
     productos_rentados = Renta.objects.all()
     productos = Producto.objects.exclude(renta__in=productos_rentados)
-    return render(request, 'productos/index.html', {'productos': productos})
+    
+    is_usuario_c = request.user.groups.filter(name='usuario_c').exists()
+    is_adminn = request.user.groups.filter(name='administrador').exists()
+    
+    # Pasar la información de productos y el estado del grupo al contexto
+    return render(request, 'productos/index.html', {
+        'productos': productos,
+        'is_usuario_c': is_usuario_c,
+        'is_adminn': is_adminn
+    })
 
 @login_required
 @user_passes_test(is_prov_or_admin)
