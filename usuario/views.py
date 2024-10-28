@@ -82,8 +82,9 @@ def registrar_usuario(request):
 @login_required
 @user_passes_test(is_admin)
 def usuarios(request):
-    # Solo aquellos que no estan ocultos
-    usuarios = Usuario.objects.filter(oculto=False)
+    usuario_actual = request.user
+    # Solo aquellos que no estan ocultos y no sean el usuario actual
+    usuarios = Usuario.objects.filter(oculto=False).exclude(user = usuario_actual)
     return render(request, 'usuarios/index.html', {'usuarios': usuarios})
 
 @login_required
