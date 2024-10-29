@@ -3,8 +3,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 
+from usuario.models import Usuario
+
 from .forms import ProductoForm , EditarProductoForm
 from .models import Producto, Renta
+from django.contrib import messages
+from django.contrib import messages
 
 def is_user_c(user):
     return user.groups.filter(name='usuario_c').exists()
@@ -90,17 +94,24 @@ def editar_producto(request, id):
 @login_required
 @user_passes_test(is_prov_or_admin)
 def eliminar_producto(request, id):
-    libro = Producto.objects.get(id=id)
-    libro.delete()
+    producto = Producto.objects.get(id=id)
+    producto.delete()
     return redirect('admin_productos')
 
 @login_required
 @user_passes_test(is_user_c_or_admin)
 def rentar_producto(request, id):
-    usuario = request.user
-    libro = Producto.objects.get(id=id)
-    libro.disponibilidad = False
-    renta = Renta(id_libro=libro, id_deudor=usuario, fecha_prestamo=timezone.now())
-    libro.save()
-    renta.save()
-    return redirect('productos')
+    user = request.user
+    usuario = Usuario.objects.get(user=user)
+    producto = Producto.objects.get(id=id)
+
+    if usuario.puntos >= producto.costo:
+        usuario.puntos -= producto.costo
+        usuario.save()
+        renta = Renta(id_libro=producto, id_deudor=user, fecha_prestamo=timezone.now())
+        renta.save()
+        messages.success(request, 'Producto rentado exitosamente.')
+        return redirect('productos')
+    else:
+        messages.error(request, 'No tienes suficientes puntos para rentar este producto.')
+        return redirect('productos')
