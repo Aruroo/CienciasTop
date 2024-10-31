@@ -7,22 +7,64 @@ from .forms import ProductoForm , EditarProductoForm
 from .models import Producto, Renta
 
 def is_user_c(user):
+    """
+    Verifica si el usuario pertenece al grupo 'usuario_c'.
+
+    Args:
+        user (User): Objeto del usuario a verificar.
+
+    Returns:
+        bool: True si el usuario pertenece al grupo 'usuario_c', False en caso contrario.
+    """
     return user.groups.filter(name='usuario_c').exists()
+
 def is_prov(user):
+    """
+    Verifica si el usuario pertenece al grupo 'proveedor'.
+
+    Args:
+        user (User): Objeto del usuario a verificar.
+
+    Returns:
+        bool: True si el usuario pertenece al grupo 'proveedor', False en caso contrario.
+    """
     return user.groups.filter(name='proveedor').exists()
+
 def is_prov_or_admin(user):
+    """
+    Verifica si el usuario pertenece al grupo 'proveedor' o 'administrador'.
+
+    Args:
+        user (User): Objeto del usuario a verificar.
+
+    Returns:
+        bool: True si el usuario pertenece al grupo 'proveedor' o 'administrador', False en caso contrario.
+    """
     return user.groups.filter(name='proveedor').exists() or user.groups.filter(name='administrador').exists()
+
 def is_user_c_or_admin(user):
+    """
+    Verifica si el usuario pertenece al grupo 'usuario_c' o 'administrador'.
+
+    Args:
+        user (User): Objeto del usuario a verificar.
+
+    Returns:
+        bool: True si el usuario pertenece al grupo 'usuario_c' o 'administrador', False en caso contrario.
+    """
     return user.groups.filter(name='usuario_c').exists() or user.groups.filter(name='administrador').exists()
 
-#@login_required
-# def inicio(request):
-#     return render(request, 'productos/index.html')
-
-# Productos
 @login_required
 def productos(request):
-    # Obtener todos los productos que están rentados
+    """
+    Muestra la lista de productos disponibles para rentar.
+
+    Args:
+        request (HttpRequest): Objeto de la solicitud HTTP.
+
+    Returns:
+        HttpResponse: Respuesta HTTP con la lista de productos disponibles y el estado del grupo del usuario.
+    """
     productos_rentados = Renta.objects.all()
     productos = Producto.objects.exclude(renta__in=productos_rentados)
     
@@ -30,7 +72,6 @@ def productos(request):
     is_adminn = request.user.groups.filter(name='administrador').exists()
     is_prov = request.user.groups.filter(name='proveedor').exists()
 
-    # Pasar la información de productos y el estado del grupo al contexto
     return render(request, 'productos/index.html', {
         'productos': productos,
         'is_usuario_c': is_usuario_c,
@@ -41,6 +82,15 @@ def productos(request):
 @login_required
 @user_passes_test(is_prov_or_admin)
 def admin_producto(request):
+    """
+    Muestra la lista de productos para el administrador o proveedor.
+
+    Args:
+        request (HttpRequest): Objeto de la solicitud HTTP.
+
+    Returns:
+        HttpResponse: Respuesta HTTP con la lista de productos para el administrador o proveedor.
+    """
     is_usuario_c = request.user.groups.filter(name='usuario_c').exists()
     is_adminn = request.user.groups.filter(name='administrador').exists()
     is_prov = request.user.groups.filter(name='proveedor').exists()
@@ -58,8 +108,16 @@ def admin_producto(request):
 @login_required
 @user_passes_test(is_prov_or_admin)
 def agregar_producto(request):
+    """
+    Permite al proveedor o administrador agregar un nuevo producto.
+
+    Args:
+        request (HttpRequest): Objeto de la solicitud HTTP.
+
+    Returns:
+        HttpResponse: Redirige a la vista de administración de productos si el formulario es válido.
+    """
     if request.method == 'POST':
-        # Hay que incluir request.FILES para manejar las imágenes
         form = ProductoForm(request.POST, request.FILES)
         if form.is_valid():
             producto = form.save(commit=False)
@@ -68,21 +126,29 @@ def agregar_producto(request):
             return redirect('admin_productos')
     else:
         form = ProductoForm()
-    return render(request, 'agregar_producto.html', {'form': form}) # TODO Redirigir
+    return render(request, 'agregar_producto.html', {'form': form})
 
 @login_required
 @user_passes_test(is_prov_or_admin)
 def editar_producto(request, id):
+    """
+    Permite al proveedor o administrador editar un producto existente.
+
+    Args:
+        request (HttpRequest): Objeto de la solicitud HTTP.
+        id (int): ID del producto a editar.
+
+    Returns:
+        HttpResponse: Redirige a la vista de administración de productos si el formulario es válido.
+    """
     producto = get_object_or_404(Producto, id=id)
 
     if request.method == 'POST':
         form = EditarProductoForm(request.POST, instance=producto)
         if form.is_valid():
             form.save()
-            # Redirige a la vista de lista de productos (admin_productos)
             return redirect('admin_productos')
     else:
-        # Cargar los datos actuales del producto en el formulario
         form = EditarProductoForm(instance=producto)
 
     return render(request, 'editar_producto.html', {'form': form})
@@ -90,6 +156,16 @@ def editar_producto(request, id):
 @login_required
 @user_passes_test(is_prov_or_admin)
 def eliminar_producto(request, id):
+    """
+    Permite al proveedor o administrador eliminar un producto.
+
+    Args:
+        request (HttpRequest): Objeto de la solicitud HTTP.
+        id (int): ID del producto a eliminar.
+
+    Returns:
+        HttpResponse: Redirige a la vista de administración de productos.
+    """
     libro = Producto.objects.get(id=id)
     libro.delete()
     return redirect('admin_productos')
@@ -97,6 +173,16 @@ def eliminar_producto(request, id):
 @login_required
 @user_passes_test(is_user_c_or_admin)
 def rentar_producto(request, id):
+    """
+    Permite al usuario o administrador rentar un producto.
+
+    Args:
+        request (HttpRequest): Objeto de la solicitud HTTP.
+        id (int): ID del producto a rentar.
+
+    Returns:
+        HttpResponse: Redirige a la vista de productos después de realizar la renta.
+    """
     usuario = request.user
     libro = Producto.objects.get(id=id)
     libro.disponibilidad = False
@@ -104,3 +190,4 @@ def rentar_producto(request, id):
     libro.save()
     renta.save()
     return redirect('productos')
+
