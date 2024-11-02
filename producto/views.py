@@ -1,11 +1,12 @@
-from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
 from django.utils import timezone
-
-from .forms import ProductoForm , EditarProductoForm
+from usuario.models import Usuario
+from .forms import ProductoForm, EditarProductoForm
 from .models import Producto, Renta
+from django.contrib import messages
 
+# Group Check Functions
 def is_user_c(user):
     """
     Verifica si el usuario pertenece al grupo 'usuario_c'.
@@ -54,6 +55,7 @@ def is_user_c_or_admin(user):
     """
     return user.groups.filter(name='usuario_c').exists() or user.groups.filter(name='administrador').exists()
 
+# Views
 @login_required
 def productos(request):
     """
@@ -97,13 +99,15 @@ def admin_producto(request):
 
     user = request.user
     if user.groups.filter(name='proveedor').exists():
-        productos = Producto.objects.all().filter(user=user)
+        productos = Producto.objects.filter(user=user)
     else:
         productos = Producto.objects.all()
-    return render(request, 'productos/index_admin.html', {'productos': productos,
+    return render(request, 'productos/index_admin.html', {
+        'productos': productos,
         'is_usuario_c': is_usuario_c,
         'is_prov': is_prov,
-        'is_adminn': is_adminn})
+        'is_adminn': is_adminn
+    })
 
 @login_required
 @user_passes_test(is_prov_or_admin)
@@ -158,16 +162,16 @@ def editar_producto(request, id):
 def eliminar_producto(request, id):
     """
     Permite al proveedor o administrador eliminar un producto.
-
+    
     Args:
         request (HttpRequest): Objeto de la solicitud HTTP.
         id (int): ID del producto a eliminar.
-
+    
     Returns:
         HttpResponse: Redirige a la vista de administración de productos.
     """
-    libro = Producto.objects.get(id=id)
-    libro.delete()
+    producto = Producto.objects.get(id=id)
+    producto.delete()
     return redirect('admin_productos')
 
 @login_required
@@ -183,11 +187,17 @@ def rentar_producto(request, id):
     Returns:
         HttpResponse: Redirige a la vista de productos después de realizar la renta.
     """
-    usuario = request.user
-    libro = Producto.objects.get(id=id)
-    libro.disponibilidad = False
-    renta = Renta(id_libro=libro, id_deudor=usuario, fecha_prestamo=timezone.now())
-    libro.save()
-    renta.save()
-    return redirect('productos')
+    user = request.user
+    usuario = Usuario.objects.get(user=user)
+    producto = Producto.objects.get(id=id)
 
+    if usuario.puntos >= producto.costo:
+        usuario.puntos -= producto.costo
+        usuario.save()
+        renta = Renta(id_libro=producto, id_deudor=user, fecha_prestamo=timezone.now())
+        renta.save()
+        messages.success(request, 'Producto rentado exitosamente.')
+        return redirect('productos')
+    else:
+        messages.error(request, 'No tienes suficientes puntos para rentar este producto.')
+        return redirect('productos')
