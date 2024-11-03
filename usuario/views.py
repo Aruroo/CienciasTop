@@ -132,3 +132,13 @@ def eliminar_usuario(request, nocuenta):
     usuario.oculto = True
     usuario.save()
     return redirect('usuarios')
+
+
+def perfil(request):
+    usuario_actual = request.user
+    usuario = Usuario.objects.get(user=usuario_actual)
+    if len(usuario.nocuenta) == 9:
+        estudiante = True
+    else:
+        estudiante = False
+    return render(request, 'usuarios/perfil.html', {'usuario':usuario, 'estudiante':estudiante})
