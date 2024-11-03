@@ -1,4 +1,4 @@
-Módulos de mi Proyecto
+Modulos Usuario y Producto
 =======================
 
 .. automodule:: usuario.views

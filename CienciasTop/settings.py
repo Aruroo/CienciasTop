@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'producto',
     'usuario',
     'administrador',
-    'proveedor',
     'Home',
 ]
 
