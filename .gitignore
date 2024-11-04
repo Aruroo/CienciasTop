@@ -5,3 +5,4 @@ virt/
 .vscode/
 __pycache__/
 productos_imagenes/
+venv/
