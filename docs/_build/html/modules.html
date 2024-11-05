@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+
+<html lang="es" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Modulos Usuario y Producto &#8212; documentación de CienciasTop - 1.0.0</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=686e5160" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <script src="_static/documentation_options.js?v=36c4ab74"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/translations.js?v=f85f4cfb"></script>
+    <link rel="index" title="Índice" href="genindex.html" />
+    <link rel="search" title="Búsqueda" href="search.html" />
+    <link rel="prev" title="CienciasTop documentation" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="modulos-usuario-y-producto">
+<h1>Modulos Usuario y Producto<a class="headerlink" href="#modulos-usuario-y-producto" title="Link to this heading">¶</a></h1>
+<dl class="py function" id="module-usuario.views">
+<dt class="sig sig-object py" id="usuario.views.custom_login">
+<span class="sig-prename descclassname"><span class="pre">usuario.views.</span></span><span class="sig-name descname"><span class="pre">custom_login</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#usuario.views.custom_login" title="Link to this definition">¶</a></dt>
+<dd><p>Autentica al usuario utilizando su número de cuenta y contraseña.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HttpRequest</em>) – Objeto de la solicitud HTTP.</p>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Redirige a la vista de productos si la autenticación es exitosa.</dt><dd><p>Si la autenticación falla, muestra un mensaje de error en la misma página de inicio de sesión.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-odd"><p>HttpResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="usuario.views.custom_logout">
+<span class="sig-prename descclassname"><span class="pre">usuario.views.</span></span><span class="sig-name descname"><span class="pre">custom_logout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#usuario.views.custom_logout" title="Link to this definition">¶</a></dt>
+<dd><p>Cierra la sesión del usuario autenticado y redirige a la página de inicio de sesión.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HttpRequest</em>) – Objeto de la solicitud HTTP.</p>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>Redirige a la página de inicio de sesión.</p>
+</dd>
+<dt class="field-odd">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-odd"><p>HttpResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="usuario.views.editar_usuario">
+<span class="sig-prename descclassname"><span class="pre">usuario.views.</span></span><span class="sig-name descname"><span class="pre">editar_usuario</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nocuenta</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#usuario.views.editar_usuario" title="Link to this definition">¶</a></dt>
+<dd><p>Permite al administrador editar la información de un usuario y cambiar su tipo de usuario si es necesario.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> (<em>HttpRequest</em>) – Objeto de la solicitud HTTP.</p></li>
+<li><p><strong>nocuenta</strong> (<em>str</em>) – Número de cuenta del usuario a editar.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>Redirige a la vista de usuarios si el formulario es válido, o muestra el formulario de edición en caso contrario.</p>
+</dd>
+<dt class="field-odd">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-odd"><p>HttpResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="usuario.views.eliminar_usuario">
+<span class="sig-prename descclassname"><span class="pre">usuario.views.</span></span><span class="sig-name descname"><span class="pre">eliminar_usuario</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nocuenta</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#usuario.views.eliminar_usuario" title="Link to this definition">¶</a></dt>
+<dd><p>Permite al administrador ocultar un usuario, en lugar de eliminarlo permanentemente.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> (<em>HttpRequest</em>) – Objeto de la solicitud HTTP.</p></li>
+<li><p><strong>nocuenta</strong> (<em>str</em>) – Número de cuenta del usuario a ocultar.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>Redirige a la vista de usuarios.</p>
+</dd>
+<dt class="field-odd">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-odd"><p>HttpResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="usuario.views.is_admin">
+<span class="sig-prename descclassname"><span class="pre">usuario.views.</span></span><span class="sig-name descname"><span class="pre">is_admin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#usuario.views.is_admin" title="Link to this definition">¶</a></dt>
+<dd><p>Verifica si el usuario pertenece al grupo “administrador”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>user</strong> (<em>User</em>) – Objeto del usuario a verificar.</p>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>True si el usuario pertenece al grupo “administrador”, False en caso contrario.</p>
+</dd>
+<dt class="field-odd">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="usuario.views.registrar_usuario">
+<span class="sig-prename descclassname"><span class="pre">usuario.views.</span></span><span class="sig-name descname"><span class="pre">registrar_usuario</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#usuario.views.registrar_usuario" title="Link to this definition">¶</a></dt>
+<dd><p>Permite al administrador registrar un nuevo usuario, validando duplicados de número de cuenta y correo electrónico.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HttpRequest</em>) – Objeto de la solicitud HTTP.</p>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>Redirige a la vista de usuarios si el registro es exitoso, o muestra un formulario de registro con errores en caso contrario.</p>
+</dd>
+<dt class="field-odd">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-odd"><p>HttpResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="usuario.views.usuarios">
+<span class="sig-prename descclassname"><span class="pre">usuario.views.</span></span><span class="sig-name descname"><span class="pre">usuarios</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#usuario.views.usuarios" title="Link to this definition">¶</a></dt>
+<dd><p>Muestra una lista de usuarios no ocultos, excluyendo al usuario actual.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HttpRequest</em>) – Objeto de la solicitud HTTP.</p>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>Respuesta HTTP con la lista de usuarios no ocultos.</p>
+</dd>
+<dt class="field-odd">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-odd"><p>HttpResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function" id="module-producto.views">
+<dt class="sig sig-object py" id="producto.views.admin_producto">
+<span class="sig-prename descclassname"><span class="pre">producto.views.</span></span><span class="sig-name descname"><span class="pre">admin_producto</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#producto.views.admin_producto" title="Link to this definition">¶</a></dt>
+<dd><p>Muestra la lista de productos para el administrador o proveedor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HttpRequest</em>) – Objeto de la solicitud HTTP.</p>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>Respuesta HTTP con la lista de productos para el administrador o proveedor.</p>
+</dd>
+<dt class="field-odd">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-odd"><p>HttpResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="producto.views.agregar_producto">
+<span class="sig-prename descclassname"><span class="pre">producto.views.</span></span><span class="sig-name descname"><span class="pre">agregar_producto</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#producto.views.agregar_producto" title="Link to this definition">¶</a></dt>
+<dd><p>Permite al proveedor o administrador agregar un nuevo producto.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HttpRequest</em>) – Objeto de la solicitud HTTP.</p>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>Redirige a la vista de administración de productos si el formulario es válido.</p>
+</dd>
+<dt class="field-odd">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-odd"><p>HttpResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="producto.views.editar_producto">
+<span class="sig-prename descclassname"><span class="pre">producto.views.</span></span><span class="sig-name descname"><span class="pre">editar_producto</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#producto.views.editar_producto" title="Link to this definition">¶</a></dt>
+<dd><p>Permite al proveedor o administrador editar un producto existente.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> (<em>HttpRequest</em>) – Objeto de la solicitud HTTP.</p></li>
+<li><p><strong>id</strong> (<em>int</em>) – ID del producto a editar.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>Redirige a la vista de administración de productos si el formulario es válido.</p>
+</dd>
+<dt class="field-odd">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-odd"><p>HttpResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="producto.views.eliminar_producto">
+<span class="sig-prename descclassname"><span class="pre">producto.views.</span></span><span class="sig-name descname"><span class="pre">eliminar_producto</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#producto.views.eliminar_producto" title="Link to this definition">¶</a></dt>
+<dd><p>Permite al proveedor o administrador eliminar un producto.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> (<em>HttpRequest</em>) – Objeto de la solicitud HTTP.</p></li>
+<li><p><strong>id</strong> (<em>int</em>) – ID del producto a eliminar.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>Redirige a la vista de administración de productos.</p>
+</dd>
+<dt class="field-odd">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-odd"><p>HttpResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="producto.views.is_prov">
+<span class="sig-prename descclassname"><span class="pre">producto.views.</span></span><span class="sig-name descname"><span class="pre">is_prov</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#producto.views.is_prov" title="Link to this definition">¶</a></dt>
+<dd><p>Verifica si el usuario pertenece al grupo “proveedor”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>user</strong> (<em>User</em>) – Objeto del usuario a verificar.</p>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>True si el usuario pertenece al grupo “proveedor”, False en caso contrario.</p>
+</dd>
+<dt class="field-odd">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="producto.views.is_prov_or_admin">
+<span class="sig-prename descclassname"><span class="pre">producto.views.</span></span><span class="sig-name descname"><span class="pre">is_prov_or_admin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#producto.views.is_prov_or_admin" title="Link to this definition">¶</a></dt>
+<dd><p>Verifica si el usuario pertenece al grupo “proveedor” o “administrador”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>user</strong> (<em>User</em>) – Objeto del usuario a verificar.</p>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>True si el usuario pertenece al grupo “proveedor” o “administrador”, False en caso contrario.</p>
+</dd>
+<dt class="field-odd">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="producto.views.is_user_c">
+<span class="sig-prename descclassname"><span class="pre">producto.views.</span></span><span class="sig-name descname"><span class="pre">is_user_c</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#producto.views.is_user_c" title="Link to this definition">¶</a></dt>
+<dd><p>Verifica si el usuario pertenece al grupo “usuario_c”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>user</strong> (<em>User</em>) – Objeto del usuario a verificar.</p>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>True si el usuario pertenece al grupo “usuario_c”, False en caso contrario.</p>
+</dd>
+<dt class="field-odd">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="producto.views.is_user_c_or_admin">
+<span class="sig-prename descclassname"><span class="pre">producto.views.</span></span><span class="sig-name descname"><span class="pre">is_user_c_or_admin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#producto.views.is_user_c_or_admin" title="Link to this definition">¶</a></dt>
+<dd><p>Verifica si el usuario pertenece al grupo “usuario_c” o “administrador”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>user</strong> (<em>User</em>) – Objeto del usuario a verificar.</p>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>True si el usuario pertenece al grupo “usuario_c” o “administrador”, False en caso contrario.</p>
+</dd>
+<dt class="field-odd">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="producto.views.productos">
+<span class="sig-prename descclassname"><span class="pre">producto.views.</span></span><span class="sig-name descname"><span class="pre">productos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#producto.views.productos" title="Link to this definition">¶</a></dt>
+<dd><p>Muestra la lista de productos disponibles para rentar.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>HttpRequest</em>) – Objeto de la solicitud HTTP.</p>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>Respuesta HTTP con la lista de productos disponibles y el estado del grupo del usuario.</p>
+</dd>
+<dt class="field-odd">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-odd"><p>HttpResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="producto.views.rentar_producto">
+<span class="sig-prename descclassname"><span class="pre">producto.views.</span></span><span class="sig-name descname"><span class="pre">rentar_producto</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#producto.views.rentar_producto" title="Link to this definition">¶</a></dt>
+<dd><p>Permite al usuario o administrador rentar un producto.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> (<em>HttpRequest</em>) – Objeto de la solicitud HTTP.</p></li>
+<li><p><strong>id</strong> (<em>int</em>) – ID del producto a rentar.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>Redirige a la vista de productos después de realizar la renta.</p>
+</dd>
+<dt class="field-odd">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-odd"><p>HttpResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">CienciasTop</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Ir a" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navegación</h3>
+<p class="caption" role="heading"><span class="caption-text">Contenido:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Modulos Usuario y Producto</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#usuario.views.custom_login"><code class="docutils literal notranslate"><span class="pre">custom_login()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#usuario.views.custom_logout"><code class="docutils literal notranslate"><span class="pre">custom_logout()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#usuario.views.editar_usuario"><code class="docutils literal notranslate"><span class="pre">editar_usuario()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#usuario.views.eliminar_usuario"><code class="docutils literal notranslate"><span class="pre">eliminar_usuario()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#usuario.views.is_admin"><code class="docutils literal notranslate"><span class="pre">is_admin()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#usuario.views.registrar_usuario"><code class="docutils literal notranslate"><span class="pre">registrar_usuario()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#usuario.views.usuarios"><code class="docutils literal notranslate"><span class="pre">usuarios()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#producto.views.admin_producto"><code class="docutils literal notranslate"><span class="pre">admin_producto()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#producto.views.agregar_producto"><code class="docutils literal notranslate"><span class="pre">agregar_producto()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#producto.views.editar_producto"><code class="docutils literal notranslate"><span class="pre">editar_producto()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#producto.views.eliminar_producto"><code class="docutils literal notranslate"><span class="pre">eliminar_producto()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#producto.views.is_prov"><code class="docutils literal notranslate"><span class="pre">is_prov()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#producto.views.is_prov_or_admin"><code class="docutils literal notranslate"><span class="pre">is_prov_or_admin()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#producto.views.is_user_c"><code class="docutils literal notranslate"><span class="pre">is_user_c()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#producto.views.is_user_c_or_admin"><code class="docutils literal notranslate"><span class="pre">is_user_c_or_admin()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#producto.views.productos"><code class="docutils literal notranslate"><span class="pre">productos()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#producto.views.rentar_producto"><code class="docutils literal notranslate"><span class="pre">rentar_producto()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="capítulo anterior">CienciasTop documentation</a></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Jonathan Preciado, Marco Padilla, Luis Bello, André Villareal.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.1.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="_sources/modules.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
