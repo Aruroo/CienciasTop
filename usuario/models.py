@@ -13,7 +13,7 @@ class Usuario(models.Model):
     area = models.CharField(max_length=100, default='trabajador')
     email = models.EmailField()
     oculto = models.BooleanField(default=False)
-    devoluciones_tardias = models.IntegerField(default=0)  # New field to track late returns
+    devoluciones_tardias = models.IntegerField(default=0)  
 
     def __str__(self):
         return f"{self.nombre} {self.apellidopaterno} {self.apellidomaterno}"

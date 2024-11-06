@@ -16,7 +16,7 @@ class Producto(models.Model):
             MaxValueValidator(7)
         ]
     )
-    veces_rentado_mes = models.IntegerField(default=0)  # Added this field here
+    veces_rentado_mes = models.IntegerField(default=0)  
 
     def __str__(self):
         return self.nombre + ' - ' + str(self.costo)
