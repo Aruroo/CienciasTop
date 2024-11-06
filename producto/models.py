@@ -2,7 +2,6 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import User
 
-
 class Producto(models.Model):
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING, null=True, related_name='productos')
     id = models.BigAutoField(primary_key=True)
@@ -17,12 +16,17 @@ class Producto(models.Model):
             MaxValueValidator(7)
         ]
     )
+    veces_rentado_mes = models.IntegerField(default=0)  # Added this field here
 
     def __str__(self):
         return self.nombre + ' - ' + str(self.costo)
     
+    def incrementar_veces_rentado(self):
+        self.veces_rentado_mes += 1
+        self.save()
+
 class Renta(models.Model):
     id = models.AutoField(primary_key=True)
-    id_libro = models.ForeignKey(Producto,on_delete=models.CASCADE, verbose_name='Titulo')
-    id_deudor = models.ForeignKey(User,on_delete=models.CASCADE, verbose_name='ID_deudor')
+    id_libro = models.ForeignKey(Producto, on_delete=models.CASCADE, verbose_name='Titulo')
+    id_deudor = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='ID_deudor')
     fecha_prestamo = models.DateField()
