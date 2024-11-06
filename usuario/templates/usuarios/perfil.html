@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block titulo %} Lista de Usuarios {% endblock %}
+{% block contenido %}
+<div class="container rounded p-5 my-5 bg-dark text-white">
+    <h1 class="d-flex justify-content-center">Mi Perfil</h1>
+    <div class="row justify-content-start pt-4">
+        <div class="col-4">
+            <div class="m-2">Nombre Completo:</div>
+            {% if estudiante %}
+            <div class="m-2">Número de Cuenta:</div>
+            {% else %}
+            <div class="m-2">No. Trabajador:</div>
+            {% endif %}
+            <div class="m-2">Puma Puntos:</div>
+            <div class="m-2">Número Celular: </div>
+            {% if estudiante %}
+            <div class="m-2">Área:</div>
+            {% else %}
+            <div class="m-2">Ocupación:</div>
+            {% endif %}
+            <div class="m-2">Dirección E-mail:</div>
+        </div>
+        <div class="col-6">
+            <div class="m-2">{{usuario.nombre}} {{usuario.apellidopaterno}} {{usuario.apellidomaterno}}</div>
+            <div class="m-2">{{usuario.nocuenta}}</div>
+            <div class="m-2">{{usuario.puntos}}</div>
+            <div class="m-2">{{usuario.celular}}</div>
+            <div class="m-2">{{usuario.area}}</div>
+            <div class="m-2">{{usuario.email}}</div>
+        </div>
+        
+    </div>
+</div>
+{% endblock %}
