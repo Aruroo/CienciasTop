@@ -8,6 +8,9 @@ from django.contrib import messages
 #from django.urls import reverse
 from .forms import UserEditForm, UserRegistrationForm
 from .models import Usuario
+from producto.models import Renta, Producto
+
+import datetime
 
 def is_admin(user):
     return user.groups.filter(name='administrador').exists()
@@ -137,8 +140,29 @@ def eliminar_usuario(request, nocuenta):
 def perfil(request):
     usuario_actual = request.user
     usuario = Usuario.objects.get(user=usuario_actual)
+    try:
+        rentas = Renta.objects.filter(id_deudor=usuario_actual)
+    except Renta.DoesNotExist:
+        rentas = None
+        
+    rentas_activas = []
+    for renta in rentas:
+        objeto_rentado = renta.id_libro
+        fecha_devolucion = renta.fecha_prestamo + datetime.timedelta(days=objeto_rentado.dias)
+        rentas_activas.append({'renta':renta, 'fecha_devolucion':fecha_devolucion})
+    
     if len(usuario.nocuenta) == 9:
-        estudiante = True
+        es_estudiante = True
     else:
-        estudiante = False
-    return render(request, 'usuarios/perfil.html', {'usuario':usuario, 'estudiante':estudiante})
+        es_estudiante = False
+        
+    if usuario_actual.groups.filter(name='proveedor').exists():
+        es_proveedor = True
+    else:
+        es_proveedor = False
+    return render(request, 'usuarios/perfil.html', 
+                  {'usuario':usuario, 
+                   'es_estudiante':es_estudiante, 
+                   'es_proveedor':es_proveedor,
+                   'rentas_activas':rentas_activas
+                   })
