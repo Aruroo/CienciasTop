@@ -22,11 +22,8 @@ from usuario.views import custom_login
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    #path('administrador/', include('administrador.urls')),
     path('', custom_login),
     path('usuarios/', include('usuario.urls')),
-    #path('inicio/', include('Home.urls')),
     path('inicio/',include('producto.urls')),
-    #path('media/', include('producto.urls')),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
