@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block titulo %} Lista de Usuarios {% endblock %}
+{% block contenido %}
+<div class="card-body bg-info text-white">
+    <h4 class="card-title">Mi Perfil</h4>
+    <div class="table-responsive">
+        <table class="table bg-info">
+            <thead>
+                <tr>
+                    <th scope="col">Datos:</th>
+                    <th scope="col"></th>
+                    {% if not es_proveedor %}
+                    <th scope="col">Productos Rentados Actualmente</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="">
+                    <td scope="row">Nombre: </td>
+                    <td scope="row">{{usuario.nombre}} {{usuario.apellidopaterno}} {{usuario.apellidomaterno}} </td>
+                    {% if not es_proveedor %}
+                    <td scope="row" rowspan="6" class="p-4">
+                        <div class="m-0 p-0">
+                            <div class="card-body m-0 p-0">
+                                <div class="table-responsive m-0">
+                                    <table class="table table-bordered table-info m-0">
+                                        <thead>
+                                            <tr class="">
+                                                <th scope="col">Producto</th>
+                                                <th scope="col">Fecha de Prestamo</th>
+                                                <th scope="col">Fecha de Devolución</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% if not rentas_activas %}
+                                            <tr class="">
+                                                <td scope="row"> ... </td>
+                                                <td> ... </td>
+                                                <td>...</td>
+                                            </tr>
+                                            {% endif %}
+                                            {% for producto in rentas_activas %}
+                                            
+                                            <tr class="">
+                                                <td scope="row"> {{producto.renta.id_libro}} </td>
+                                                <td>{{producto.renta.fecha_prestamo}}</td>
+                                                <td>{{producto.fecha_devolucion}}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-row-reverse mt-3">
+                            <button type="button" class="btn btn-primary">Ver Historial Completo</button>
+                        </div>
+                    </td>
+                    {% endif %}
+                </tr>
+                <tr class="">
+                    {% if es_estudiante %}
+                    <td scope="row" class="col-2">No. Cuenta: </td>
+                    {% else %}
+                    <td scope="row" class="col-2">No. Trabajador: </td>
+                    {% endif %}
+                    <td scope="row">{{usuario.nocuenta}}</td>
+                </tr>
+                <tr class="">
+                    <td scope="row">Puma Puntos Totales: </td>
+                    <td scope="row">{{usuario.puntos}}</td>
+                </tr>
+                <tr class="">
+                    <td scope="row">Puma Puntos del Mes: </td>
+                    <td scope="row"></td>
+                </tr>
+                <tr class="">
+                    <td scope="row">No. Celular: </td>
+                    <td scope="row">{{usuario.celular}}</td>
+                </tr>
+                <tr class="">
+                    <td scope="row">Área: </td>
+                    <td scope="row">{{usuario.area}}</td>
+                </tr>
+                <tr class="">
+                    <td scope="row">Email: </td>
+                    <td scope="row">{{usuario.email}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+{% endblock %}
