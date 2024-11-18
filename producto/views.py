@@ -68,7 +68,7 @@ def productos(request):
         HttpResponse: Respuesta HTTP con la lista de productos disponibles y el estado del grupo del usuario.
     """
     productos_rentados = Renta.objects.all()
-    productos = Producto.objects.exclude(renta__in=productos_rentados)
+    productos = Producto.objects.exclude(rentas__in=productos_rentados)
     
     is_usuario_c = request.user.groups.filter(name='usuario_c').exists()
     is_adminn = request.user.groups.filter(name='administrador').exists()

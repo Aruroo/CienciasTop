@@ -10,6 +10,7 @@ from .forms import UserEditForm, UserRegistrationForm
 from .models import Usuario
 from producto.models import Renta, Producto
 from datetime import datetime, timedelta
+from django.db.models import Count
 
 import datetime as dt
 
@@ -312,3 +313,174 @@ def historial(request):
                    'is_usuario_c': is_usuario_c,
                    'is_prov': is_prov,
                    'is_adminn': is_adminn})
+
+@login_required
+@user_passes_test(is_admin)
+def reporte_usuarios_activos(request):
+    """
+    Reporta la cantidad de usuarios activos por carrera.
+
+    Args:
+        request (HttpRequest): Objeto de la solicitud HTTP
+
+    Returns:
+        HttpResponse: Redirige a la vista del reporte
+    """
+    carreras = {
+        'actuaria': 0,
+        'biologia': 0,
+        'computacion': 0,
+        'tierra': 0,
+        'fisica': 0,
+        'biomedica': 0,
+        'matematicas': 0,
+        'aplicadas': 0
+    }
+    
+    for carrera in carreras.keys():
+        carreras[carrera] = usuarios_carrera(carrera)
+
+    vista = "TODO.HTML"
+    return render(request, vista, {'carreras': carreras})
+
+def usuarios_carrera(carrera):
+    """
+    Método auxiliar que devuelve la cantidad de usuarios
+    activos que pertenecen a la carrera especificada.
+    """
+    return Usuario.objects.filter(area=carrera, oculto=False).count()
+
+@login_required
+@user_passes_test(is_admin)
+def reporte_productos_baratos(request):
+    """
+    Reporta los productos ordenandolos segun su costo de menor a mayor
+    
+    Args:
+        request (HttpRequest): Objeto de la solicitud HTTP
+    
+    Returns:
+        HttpResponse: Redirige a la vista del reporte
+    """
+    productos = Producto.objects.all().order_by('costo')
+    vista = "TODO.HTML"
+    return render(request, vista, {'productos': productos})
+
+@login_required
+@user_passes_test(is_admin)
+def reporte_usuarios_morosos(request):
+    """
+    Reporta los 10 usuarios que mas veces han devuelto
+    un producto tarde
+
+    Args:
+        request (HttpRequest): Objeto de la solicitud HTTP
+
+    Returns:
+        HttpResponse: Redirige a la vista del reporte
+    """
+    usuarios = 'TODO'
+    vista = "TODO.HTML"
+    contexto = {'usuarios': usuarios}
+    return render(request, vista, contexto)
+
+@login_required
+@user_passes_test(is_admin)
+def reporte_productos_mas_rentados(request):
+    """
+    Reporta los 5 productos mas rentados
+    del mes
+
+    Args:
+        request (HttpRequest): Objeto de la solicitud HTTP
+
+    Returns:
+        HttpResponse: Redirige a la vista del reporte
+    """
+    productos = Producto.objects.annotate(cantidad_rentas=Count('rentas')).order_by('-cantidad_rentas')[:5]
+
+    vista = "TODO.HTML"
+    contexto = {'productos': productos}
+    return render(request, vista, contexto)
+
+@login_required
+@user_passes_test(is_admin)
+def reporte_cantidad_cuentas_inactivas(request):
+    """
+    Reporta la cantidad de cuentas inactivas.
+    Tambien enlista dichas cuentas
+    Args:
+        request (HttpRequest): Objeto de la solicitud HTTP
+
+    Returns:
+        HttpResponse: Redirige a la vista del reporte
+    """
+    inactivos = Usuario.objects.filter(oculto=True)
+    cantidad = inactivos.count()
+    vista = "TODO.HTML"
+    contexto = {'inactivos': inactivos , 'cantidad': cantidad}
+    return render(request, vista, contexto)
+
+@login_required
+@user_passes_test(is_admin)
+def reporte_usuarios_mas_activos(request):
+    """
+    Reporta los 5 usuarios con mayor cantidad de 
+    productos rentados
+
+    Args:
+        request (HttpRequest): Objeto de la solicitud HTTP
+
+    Returns:
+        HttpResponse: Redirige a la vista del reporte
+    """
+    usuarios = Renta.objects.values('id_deudor').annotate(cantidad_rentas=Count('id')).order_by('-cantidad_rentas')[:5]
+    vista = "TODO.HTML"
+    contexto = {'usuarios': usuarios}
+    return render(request, vista, contexto)
+
+
+def reportes_menu(request):
+    """
+    Despliega un menú de reportes para el administrador.
+
+    Args:
+        request (HttpRequest): Objeto de la solicitud HTTP.
+
+    Returns:
+        HttpResponse: Respuesta HTTP con el menú de reportes.
+    """
+    reportes = [
+        {
+            'nombre': 'Reporte de cuentas activas por carrera',
+            'nombre_url': 'reporte_usuarios_activos',
+            'descripcion': 'Muestra todos los estudiantes activos en el sistema'
+        },
+        {
+            'nombre': 'Reporte de productos con menor costo',
+            'nombre_url': 'reporte_productos_baratos',
+            'descripcion': 'Muestra los productos con los precios más bajos'
+        },
+        {
+            'nombre': 'Reporte de los 10 usuarios mas incumplidos',
+            'nombre_url': 'reporte_morosos',
+            'descripcion': 'Lista a los 10 usuarios con mas devoluciones tardias'
+        },
+        {
+            'nombre': 'Reporte de Productos Más Rentados',
+            'nombre_url': 'reporte_mas_rentados',
+            'descripcion': 'Muestra los 5 productos mas rentados'
+        },
+        {
+            'nombre': 'Reporte de Usuarios Inactivos',
+            'nombre_url': 'reporte_usuarios_inactivos',
+            'descripcion': 'Muestra la cantidad de cuentas inactivas'
+        },
+        {
+            'nombre': 'Reporte de 5 Usuarios Más Activos',
+            'nombre_url': 'reporte_usuarios_mas_activos',
+            'descripcion': 'Lista a los 5 usuarios con mayor cantidad de productos rentados'
+        },
+    ]
+
+    return render(request, 'usuarios/reportes.html', {'reportes': reportes})
