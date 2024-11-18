@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block titulo %} Historial de Productos Rentados este Mes {% endblock %}
+{% block contenido %}
+<div class="card-body bg-info text-white">
+    <h4 class="card-title">Historial de Productos Rentados</h4>
+    <div class="table-responsive">
+        <table class="table bg-info">
+            <thead>
+                <tr>
+                    <th scope="col">Producto</th>
+                    <th scope="col">Costo</th>
+                    <th scope="col">Descripción</th>
+                    <th scope="col">Categoría</th>
+                    <th scope="col">Días Permitidos</th>
+                    <th scope="col">Fecha de Préstamo</th>
+                    <th scope="col">Fecha de Devolución</th>
+                    <th scope="col">Imagen</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if not historial_data %}
+                <tr>
+                    <td colspan="8" class="text-center">No tienes productos rentados en tu historial.</td>
+                </tr>
+                {% else %}
+                {% for item in historial_data %}
+                <tr>
+                    <td>{{ item.nombre }}</td>
+                    <td>{{ item.costo }}</td>
+                    <td>{{ item.descripcion }}</td>
+                    <td>{{ item.categoria }}</td>
+                    <td>{{ item.dias }}</td>
+                    <td>{{ item.fecha_prestamo }}</td>
+                    <td>{{ item.fecha_devolucion }}</td>
+                    <td>
+                        {% if item.imagen %}
+                        <img src="{{ item.imagen }}" alt="Imagen de {{ item.nombre }}" width="100">
+                        {% else %}
+                        Sin imagen
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+    <div class="d-flex flex-row-reverse mt-3">
+        <a href="{% url 'perfil' %}" class="btn btn-primary">Volver al Perfil</a>
+    </div>
+</div>
+{% endblock %}
