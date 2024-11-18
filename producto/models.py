@@ -23,6 +23,9 @@ class Producto(models.Model):
     
 class Renta(models.Model):
     id = models.AutoField(primary_key=True)
-    id_libro = models.ForeignKey(Producto,on_delete=models.CASCADE, verbose_name='Titulo')
+    id_producto = models.ForeignKey(Producto,
+                                    on_delete=models.CASCADE,
+                                      verbose_name='Titulo',
+                                      related_name='rentas')
     id_deudor = models.ForeignKey(User,on_delete=models.CASCADE, verbose_name='ID_deudor')
     fecha_prestamo = models.DateField()
