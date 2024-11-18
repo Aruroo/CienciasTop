@@ -9,8 +9,57 @@ from django.contrib import messages
 from .forms import UserEditForm, UserRegistrationForm
 from .models import Usuario
 from producto.models import Renta, Producto
+from datetime import datetime, timedelta
 
-import datetime
+import datetime as dt
+
+def is_user_c(user):
+    """
+    Verifica si el usuario pertenece al grupo 'usuario_c'.
+
+    Args:
+        user (User): Objeto del usuario a verificar.
+
+    Returns:
+        bool: True si el usuario pertenece al grupo 'usuario_c', False en caso contrario.
+    """
+    return user.groups.filter(name='usuario_c').exists()
+
+def is_prov(user):
+    """
+    Verifica si el usuario pertenece al grupo 'proveedor'.
+
+    Args:
+        user (User): Objeto del usuario a verificar.
+
+    Returns:
+        bool: True si el usuario pertenece al grupo 'proveedor', False en caso contrario.
+    """
+    return user.groups.filter(name='proveedor').exists()
+
+def is_prov_or_admin(user):
+    """
+    Verifica si el usuario pertenece al grupo 'proveedor' o 'administrador'.
+
+    Args:
+        user (User): Objeto del usuario a verificar.
+
+    Returns:
+        bool: True si el usuario pertenece al grupo 'proveedor' o 'administrador', False en caso contrario.
+    """
+    return user.groups.filter(name='proveedor').exists() or user.groups.filter(name='administrador').exists()
+
+def is_user_c_or_admin(user):
+    """
+    Verifica si el usuario pertenece al grupo 'usuario_c' o 'administrador'.
+
+    Args:
+        user (User): Objeto del usuario a verificar.
+
+    Returns:
+        bool: True si el usuario pertenece al grupo 'usuario_c' o 'administrador', False en caso contrario.
+    """
+    return user.groups.filter(name='usuario_c').exists() or user.groups.filter(name='administrador').exists()
 
 def is_admin(user):
     """
@@ -183,7 +232,6 @@ def eliminar_usuario(request, nocuenta):
     usuario.save()
     return redirect('usuarios')
 
-
 def perfil(request):
     usuario_actual = request.user
     usuario = Usuario.objects.get(user=usuario_actual)
@@ -195,7 +243,7 @@ def perfil(request):
     rentas_activas = []
     for renta in rentas:
         objeto_rentado = renta.id_libro
-        fecha_devolucion = renta.fecha_prestamo + datetime.timedelta(days=objeto_rentado.dias)
+        fecha_devolucion = renta.fecha_prestamo + dt.timedelta(days=objeto_rentado.dias)
         rentas_activas.append({'renta':renta, 'fecha_devolucion':fecha_devolucion})
     
     if len(usuario.nocuenta) == 9:
@@ -207,9 +255,60 @@ def perfil(request):
         es_proveedor = True
     else:
         es_proveedor = False
+    
+    is_usuario_c = request.user.groups.filter(name='usuario_c').exists()
+    is_adminn = request.user.groups.filter(name='administrador').exists()
+    is_prov = request.user.groups.filter(name='proveedor').exists()
+
     return render(request, 'usuarios/perfil.html', 
                   {'usuario':usuario, 
                    'es_estudiante':es_estudiante, 
                    'es_proveedor':es_proveedor,
-                   'rentas_activas':rentas_activas
+                   'rentas_activas':rentas_activas,
+                   'is_usuario_c': is_usuario_c,
+                   'is_prov': is_prov,
+                   'is_adminn': is_adminn
                    })
+
+@login_required
+def historial(request):
+    usuario_actual = request.user
+    historial_data = []
+
+    hoy = datetime.now()
+    primer_dia_mes = hoy.replace(day=1)
+    if hoy.month == 12:
+        primer_dia_siguiente_mes = hoy.replace(year=hoy.year + 1, month=1, day=1)
+    else:
+        primer_dia_siguiente_mes = hoy.replace(month=hoy.month + 1, day=1)
+
+    rentas = Renta.objects.filter(
+        id_deudor=usuario_actual,
+        fecha_prestamo__gte=primer_dia_mes,
+        fecha_prestamo__lt=primer_dia_siguiente_mes
+    )
+
+    for renta in rentas:
+        producto = renta.id_libro
+        fecha_devolucion = renta.fecha_prestamo + timedelta(days=producto.dias)
+
+        historial_data.append({
+            'nombre': producto.nombre,
+            'costo': producto.costo,
+            'descripcion': producto.descripcion,
+            'imagen': producto.imagen.url if producto.imagen else None,
+            'categoria': producto.categoria,
+            'dias': producto.dias,
+            'fecha_prestamo': renta.fecha_prestamo,
+            'fecha_devolucion': fecha_devolucion,
+        })
+
+    is_usuario_c = request.user.groups.filter(name='usuario_c').exists()
+    is_adminn = request.user.groups.filter(name='administrador').exists()
+    is_prov = request.user.groups.filter(name='proveedor').exists()
+
+    return render(request, 'usuarios/historial.html',
+                 {'historial_data': historial_data,
+                   'is_usuario_c': is_usuario_c,
+                   'is_prov': is_prov,
+                   'is_adminn': is_adminn})
