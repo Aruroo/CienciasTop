@@ -243,7 +243,7 @@ def perfil(request):
         
     rentas_activas = []
     for renta in rentas:
-        objeto_rentado = renta.id_libro
+        objeto_rentado = renta.id_producto
         fecha_devolucion = renta.fecha_prestamo + dt.timedelta(days=objeto_rentado.dias)
         rentas_activas.append({'renta':renta, 'fecha_devolucion':fecha_devolucion})
     
@@ -290,7 +290,7 @@ def historial(request):
     )
 
     for renta in rentas:
-        producto = renta.id_libro
+        producto = renta.id_producto
         fecha_devolucion = renta.fecha_prestamo + timedelta(days=producto.dias)
 
         historial_data.append({
