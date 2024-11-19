@@ -193,6 +193,7 @@ def rentar_producto(request, id):
 
     if usuario.puntos >= producto.costo:
         usuario.puntos -= producto.costo
+        usuario.puntos += int(producto.costo / 2) 
         usuario.save()
         renta = Renta(id_producto=producto, id_deudor=user, fecha_prestamo=timezone.now())
         renta.save()

@@ -19,3 +19,9 @@ class Usuario(models.Model):
     
     def get_group_display(self):
         return ', '.join([group.name for group in self.user.groups.all()])  # Devuelve los grupos del usuario
+
+class Acumulacion(models.Model):
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    actividad = models.CharField(max_length=100)
+    puntos = models.IntegerField()
+    fecha = models.DateTimeField(auto_now_add=True)

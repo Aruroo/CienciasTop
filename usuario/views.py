@@ -6,8 +6,8 @@ from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages  
 #from django.urls import reverse
-from .forms import UserEditForm, UserRegistrationForm
-from .models import Usuario
+from .forms import UserEditForm, UserRegistrationForm, AcumularPuntosForm
+from .models import Usuario, Acumulacion
 from producto.models import Renta, Producto
 from datetime import datetime, timedelta, date
 from django.db.models import Count
@@ -232,6 +232,31 @@ def eliminar_usuario(request, nocuenta):
     usuario.oculto = True
     usuario.save()
     return redirect('usuarios')
+
+def acumular_puntos(request, nocuenta):
+    """
+    Acumula puntos para un usuario en función de su actividad realizada.
+    """
+    usuario = Usuario.objects.get(nocuenta=nocuenta)
+    if request.method == 'POST':
+        form = AcumularPuntosForm(request.POST)
+        if form.is_valid():
+            # Traemos todos los registros del usuario de este mes
+            registros = Acumulacion.objects.filter(
+                usuario=usuario,
+                fecha__month=datetime.now().month,
+                fecha__year=datetime.now().year
+            )
+            acumulado = sum(registro.puntos for registro in registros)
+            if acumulado >= 500:
+                messages.error(request, 'Ya has alcanzado el límite de puntos acumulables por mes.')
+
+            form.save(usuario)
+            messages.success(request, 'Puntos acumulados exitosamente.')
+    else:
+        form = AcumularPuntosForm()
+    return render(request, 'usuarios/acumular_puntos.html', {'form': form})
+   
 
 def perfil(request):
     usuario_actual = request.user
