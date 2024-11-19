@@ -194,7 +194,7 @@ def rentar_producto(request, id):
     if usuario.puntos >= producto.costo:
         usuario.puntos -= producto.costo
         usuario.save()
-        renta = Renta(id_libro=producto, id_deudor=user, fecha_prestamo=timezone.now())
+        renta = Renta(id_producto=producto, id_deudor=user, fecha_prestamo=timezone.now())
         renta.save()
         messages.success(request, 'Producto rentado exitosamente.')
         return redirect('productos')

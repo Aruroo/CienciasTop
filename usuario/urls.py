@@ -14,7 +14,7 @@ urlpatterns = [
     # Reportes
     path('reportes/usuarios-activos/', views.reporte_usuarios_activos, name='reporte_usuarios_activos'),
     path('reportes/productos-baratos/', views.reporte_productos_baratos, name='reporte_productos_baratos'),
-    path('reportes/morosos/', views.reporte_usuarios_morosos, name='reporte_morosos'),
+    path('reportes/tardios/', views.reporte_usuarios_tardios, name='reporte_tardios'),
     path('reportes/mas-rentados/', views.reporte_productos_mas_rentados, name='reporte_mas_rentados'),
     path('reportes/usuarios-inactivos/', views.reporte_cantidad_cuentas_inactivas, name='reporte_usuarios_inactivos'),
     path('reportes/usuarios-mas-activos/', views.reporte_usuarios_mas_activos, name='reporte_usuarios_mas_activos'),

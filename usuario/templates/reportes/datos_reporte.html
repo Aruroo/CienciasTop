@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block titulo %} {{ titulo }} {% endblock %}
+
+{% block contenido %}
+<div class="card-body bg-light text-dark">
+    <h4 class="card-title">{{ subtitulo }}</h4>
+    {% if cantidad %}
+    <div class="alert alert-info">
+        <strong>Cantidad total: </strong>{{ cantidad }}
+    </div>
+    {% endif %}
+    
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    {% for encabezado in encabezados %}
+                    <th scope="col">{{ encabezado }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for fila in datos %}
+                <tr>
+                    {% for celda in fila %}
+                    <td>{{ celda }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

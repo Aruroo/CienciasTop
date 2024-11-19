@@ -29,3 +29,4 @@ class Renta(models.Model):
                                       related_name='rentas')
     id_deudor = models.ForeignKey(User,on_delete=models.CASCADE, verbose_name='ID_deudor')
     fecha_prestamo = models.DateField()
+    fecha_devuelto = models.DateField(null=True)
