@@ -57,9 +57,20 @@
                                 href="{% url 'eliminar_u' usuario.nocuenta %}"
                                 role="button"
                                 onclick="return confirmarEliminacion()"
-                                >Borrar</a>
+                                >Borrar
+                            </a>
+                            
+                            <a
+                                name=""
+                                id=""
+                                class="btn btn-info"
+                                href="{% url 'acumular_puntos' usuario.nocuenta %}"
+                                role="button"
+                                >Acumular puntos
+                            </a>
+                                
 
-                             </td>
+                            </td>
                         </tr>
                         
                     {% endfor %}

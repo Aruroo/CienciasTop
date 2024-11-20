@@ -6,10 +6,11 @@ from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages  
 #from django.urls import reverse
-from .forms import UserEditForm, UserRegistrationForm
-from .models import Usuario
+from .forms import UserEditForm, UserRegistrationForm, AcumularPuntosForm
+from .models import Usuario, Acumulacion
 from producto.models import Renta, Producto
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
+from django.db.models import Count
 
 import datetime as dt
 
@@ -232,6 +233,31 @@ def eliminar_usuario(request, nocuenta):
     usuario.save()
     return redirect('usuarios')
 
+def acumular_puntos(request, nocuenta):
+    """
+    Acumula puntos para un usuario en función de su actividad realizada.
+    """
+    usuario = Usuario.objects.get(nocuenta=nocuenta)
+    if request.method == 'POST':
+        form = AcumularPuntosForm(request.POST)
+        if form.is_valid():
+            # Traemos todos los registros del usuario de este mes
+            registros = Acumulacion.objects.filter(
+                usuario=usuario,
+                fecha__month=datetime.now().month,
+                fecha__year=datetime.now().year
+            )
+            acumulado = sum(registro.puntos for registro in registros)
+            if acumulado >= 500:
+                messages.error(request, 'Ya has alcanzado el límite de puntos acumulables por mes.')
+
+            form.save(usuario)
+            messages.success(request, 'Puntos acumulados exitosamente.')
+    else:
+        form = AcumularPuntosForm()
+    return render(request, 'usuarios/acumular_puntos.html', {'form': form})
+   
+
 def perfil(request):
     usuario_actual = request.user
     usuario = Usuario.objects.get(user=usuario_actual)
@@ -242,7 +268,7 @@ def perfil(request):
         
     rentas_activas = []
     for renta in rentas:
-        objeto_rentado = renta.id_libro
+        objeto_rentado = renta.id_producto
         fecha_devolucion = renta.fecha_prestamo + dt.timedelta(days=objeto_rentado.dias)
         rentas_activas.append({'renta':renta, 'fecha_devolucion':fecha_devolucion})
     
@@ -289,7 +315,7 @@ def historial(request):
     )
 
     for renta in rentas:
-        producto = renta.id_libro
+        producto = renta.id_producto
         fecha_devolucion = renta.fecha_prestamo + timedelta(days=producto.dias)
 
         historial_data.append({
@@ -312,3 +338,245 @@ def historial(request):
                    'is_usuario_c': is_usuario_c,
                    'is_prov': is_prov,
                    'is_adminn': is_adminn})
+
+@login_required
+@user_passes_test(is_admin)
+def reporte_usuarios_activos(request):
+    """
+    Reporta la cantidad de usuarios activos por carrera.
+
+    Args:
+        request (HttpRequest): Objeto de la solicitud HTTP
+
+    Returns:
+        HttpResponse: Redirige a la vista del reporte
+    """
+    carreras = {
+        'actuaria': 0,
+        'biologia': 0,
+        'computacion': 0,
+        'tierra': 0,
+        'fisica': 0,
+        'biomedica': 0,
+        'matematicas': 0,
+        'aplicadas': 0
+    }
+    
+    for carrera in carreras.keys():
+        carreras[carrera] = usuarios_carrera(carrera)
+
+    datos = [[carrera, cantidad] for carrera, cantidad in carreras.items()]
+    vista = 'reportes/datos_reporte.html'
+    contexto = {'datos': datos,
+                'titulo': 'Usuarios activos por carrera',
+                'subtitulo': 'Cantidad de usuarios activos por carrera',
+                'encabezados': ['Carrera','Cantidad']
+                }
+    return render(request, vista, contexto)
+
+def usuarios_carrera(carrera):
+    """
+    Método auxiliar que devuelve la cantidad de usuarios
+    activos que pertenecen a la carrera especificada.
+    """
+    return Usuario.objects.filter(area=carrera, oculto=False).count()
+
+@login_required
+@user_passes_test(is_admin)
+def reporte_productos_baratos(request):
+    """
+    Reporta los productos ordenandolos segun su costo de menor a mayor
+    
+    Args:
+        request (HttpRequest): Objeto de la solicitud HTTP
+    
+    Returns:
+        HttpResponse: Redirige a la vista del reporte
+    """
+    productos = Producto.objects.all().order_by('costo')
+    datos = [[producto.nombre, producto.costo] for producto in productos]
+    vista = 'reportes/datos_reporte.html'
+    contexto = {'datos': datos,
+                'titulo': 'Productos de menor costo',
+                'subtitulo': 'Productos que requieren menor cantidad de puntos para ser canjeados',
+                'encabezados': ['producto','puntos']
+                }
+    return render(request, vista, contexto)
+
+@login_required
+@user_passes_test(is_admin)
+def reporte_usuarios_tardios(request):
+    """
+    Reporta los 10 usuarios que mas veces han devuelto
+    un producto tarde
+
+    Args:
+        request (HttpRequest): Objeto de la solicitud HTTP
+
+    Returns:
+        HttpResponse: Redirige a la vista del reporte
+    """
+    rentas_tardias = Renta.objects.filter(fecha_devuelto__isnull = False)
+    usuarios_tardios = {}
+    for renta in rentas_tardias:
+        limite = renta.fecha_prestamo + dt.timedelta(days=renta.id_producto.dias)
+        if renta.fecha_devuelto > limite:
+            usuario = renta.id_deudor.usuario
+            if usuario.nocuenta not in usuarios_tardios:
+                usuarios_tardios[usuario.nocuenta] = 0
+            usuarios_tardios[usuario.nocuenta] += 1
+
+    # Ordenamos los usuarios por la cantidad de devoluciones tardias
+    # x[0]: usuario, x[1]: cantidad de devoluciones tardias
+    usuarios_tardios_ordenados = sorted(usuarios_tardios.items(), key=lambda x: x[1], reverse=True)[:10]
+
+    datos = [[usuario, cantidad] for usuario, cantidad in usuarios_tardios_ordenados]
+
+    vista = 'reportes/datos_reporte.html'
+    contexto = {
+        'titulo': 'Usuarios morosos',
+        'subtitulo': 'Usuarios con más devoluciones tardías',
+        'encabezados': ['No. Cuenta/Trabajador', 'Cantidad de devoluciones tardías'],
+        'datos': datos
+    }
+    return render(request, vista, contexto)
+
+@login_required
+@user_passes_test(is_admin)
+def reporte_productos_mas_rentados(request):
+    """
+    Reporta los 5 productos más rentados del mes.
+
+    Args:
+        request (HttpRequest): Objeto de la solicitud HTTP.
+
+    Returns:
+        HttpResponse: Redirige a la vista del reporte.
+    """
+    hoy = date.today()
+    mes_actual = hoy.month
+    anio_actual = hoy.year
+
+    # Filtrar las rentas del mes actual
+    productos_rentados = Producto.objects.filter(
+        rentas__fecha_prestamo__month=mes_actual,
+        rentas__fecha_prestamo__year=anio_actual
+    ).annotate(
+        cantidad_rentas=Count('rentas')
+    ).order_by('-cantidad_rentas')[:5]
+    
+    # Generar la lista de datos para el template
+    datos = [[producto.nombre, producto.cantidad_rentas] for producto in productos_rentados]
+    
+    vista = 'reportes/datos_reporte.html'
+    contexto = {
+        'datos': datos,
+        'titulo': 'Productos más rentados del mes',
+        'subtitulo': 'Los 5 productos más rentados del mes',
+        'encabezados': ['Producto', 'Cantidad de rentas']
+    }
+    return render(request, vista, contexto)
+
+@login_required
+@user_passes_test(is_admin)
+def reporte_cantidad_cuentas_inactivas(request):
+    """
+    Reporta la cantidad de cuentas inactivas.
+    Tambien enlista dichas cuentas
+    Args:
+        request (HttpRequest): Objeto de la solicitud HTTP
+
+    Returns:
+        HttpResponse: Redirige a la vista del reporte
+    """
+    inactivos = Usuario.objects.filter(oculto=True)
+    cantidad = inactivos.count()
+    datos = [[usuario.nocuenta, usuario] for usuario in inactivos]
+    vista = 'reportes/datos_reporte.html'
+    contexto = {'datos': datos,
+                'titulo': 'Usuarios inactivos',
+                'subtitulo': 'Cantidad de usuarios inactivos',
+                'encabezados': ['No. cuenta/Trabajador','Nombre'],
+                'cantidad': cantidad
+                }
+    return render(request, vista, contexto)
+
+@login_required
+@user_passes_test(is_admin)
+def reporte_usuarios_mas_activos(request):
+    """
+    Reporta los 5 usuarios con mayor cantidad de 
+    productos rentados.
+
+    Args:
+        request (HttpRequest): Objeto de la solicitud HTTP.
+
+    Returns:
+        HttpResponse: Redirige a la vista del reporte.
+    """
+    # Obtener los usuarios con mas rentas, uniendo con la tabla User y Usuario
+    usuarios = (
+        Renta.objects.values('id_deudor__usuario__nocuenta', 'id_deudor__usuario__nombre')
+        .annotate(cantidad_rentas=Count('id'))
+        .order_by('-cantidad_rentas')[:5]
+    )
+
+    # Preparar los datos para el template
+    datos = [
+        [usuario['id_deudor__usuario__nocuenta'], usuario['id_deudor__usuario__nombre'], usuario['cantidad_rentas']]
+        for usuario in usuarios
+    ]
+    vista = 'reportes/datos_reporte.html'
+    contexto = {
+        'datos': datos,
+        'titulo': 'Usuarios más activos',
+        'subtitulo': 'Usuarios con mayor cantidad de productos rentados',
+        'encabezados': ['No. Cuenta/Trabajador', 'Nombre del Usuario', 'Cantidad de productos rentados']
+    }
+
+    return render(request, vista, contexto)
+
+def reportes_menu(request):
+    """
+    Despliega un menu de reportes para el administrador.
+
+    Args:
+        request (HttpRequest): Objeto de la solicitud HTTP.
+
+    Returns:
+        HttpResponse: Respuesta HTTP con el menú de reportes.
+    """
+    reportes = [
+        {
+            'nombre': 'Reporte de cuentas activas por carrera',
+            'nombre_url': 'reporte_usuarios_activos',
+            'descripcion': 'Muestra todos los estudiantes activos en el sistema'
+        },
+        {
+            'nombre': 'Reporte de productos con menor costo',
+            'nombre_url': 'reporte_productos_baratos',
+            'descripcion': 'Muestra los productos que requieren menos puntos para ser canjeados'
+        },
+        {
+            'nombre': 'Reporte de los 10 usuarios mas incumplidos',
+            'nombre_url': 'reporte_tardios',
+            'descripcion': 'Lista a los 10 usuarios con mas devoluciones tardias'
+        },
+        {
+            'nombre': 'Reporte de Productos mas rentados',
+            'nombre_url': 'reporte_mas_rentados',
+            'descripcion': 'Muestra los 5 productos mas rentados del mes'
+        },
+        {
+            'nombre': 'Reporte de cuentas inactivas',
+            'nombre_url': 'reporte_usuarios_inactivos',
+            'descripcion': 'Muestra la cantidad de cuentas inactivas'
+        },
+        {
+            'nombre': 'Reporte de los 5 usuarios mas activos',
+            'nombre_url': 'reporte_usuarios_mas_activos',
+            'descripcion': 'Lista a los 5 usuarios con mayor cantidad de productos rentados'
+        },
+    ]
+
+    return render(request, 'reportes/menu.html', {'reportes': reportes})

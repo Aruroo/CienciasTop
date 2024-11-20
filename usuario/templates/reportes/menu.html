@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block titulo %} Menú de Reportes {% endblock %}
+
+{% block contenido %}
+<div class="card-body bg-light text-dark">
+    <h4 class="card-title">Menú de Reportes</h4>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Nombre del Reporte</th>
+                    <th scope="col">Descripción</th>
+                    <th scope="col">Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reporte in reportes %}
+                <tr>
+                    <td>{{ reporte.nombre }}</td>
+                    <td>{{ reporte.descripcion }}</td>
+                    <td>
+                        <a href="{% url reporte.nombre_url %}" class="btn btn-primary">
+                            Ver Reporte
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

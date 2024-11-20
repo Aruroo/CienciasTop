@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 from phonenumber_field.formfields import PhoneNumberField
-from .models import Usuario
+from .models import Usuario, Acumulacion
 import re
 
 class UserRegistrationForm(forms.ModelForm):
@@ -217,4 +217,34 @@ class UserEditForm(forms.ModelForm):
 
             user.save()
 
+        return usuario
+
+
+class AcumularPuntosForm(forms.Form):
+    # Dev. libro
+    # Asistir a conferencias
+    # Resello de la credencial
+    ACTIVIDAD_CHOICES =[
+        ('libro', 'Devolver libro'),
+        ('asistir', 'Asistir a conferencias o eventos'),
+        ('resello', 'Resello de la credencial'),
+    ]
+    actividad = forms.ChoiceField(label='Actividad', choices=ACTIVIDAD_CHOICES, required=True)
+
+    def save(self, usuario, commit=True):
+        actividad = self.cleaned_data['actividad']
+        obtenidos = 0
+        if actividad == 'libro':
+            obtenidos = 20
+        elif actividad == 'asistir':
+            obtenidos = 15
+        elif actividad == 'resello':
+            obtenidos = 10
+        
+        usuario.puntos += obtenidos
+        if commit:
+            usuario.save()
+            # Generamos un nuevo registro en Acumulacion
+            acumulacion = Acumulacion(usuario=usuario, actividad=actividad, puntos=obtenidos)
+            acumulacion.save()
         return usuario

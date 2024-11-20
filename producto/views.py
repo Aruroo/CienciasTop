@@ -68,7 +68,7 @@ def productos(request):
         HttpResponse: Respuesta HTTP con la lista de productos disponibles y el estado del grupo del usuario.
     """
     productos_rentados = Renta.objects.all()
-    productos = Producto.objects.exclude(renta__in=productos_rentados)
+    productos = Producto.objects.exclude(rentas__in=productos_rentados)
     
     is_usuario_c = request.user.groups.filter(name='usuario_c').exists()
     is_adminn = request.user.groups.filter(name='administrador').exists()
@@ -193,8 +193,9 @@ def rentar_producto(request, id):
 
     if usuario.puntos >= producto.costo:
         usuario.puntos -= producto.costo
+        usuario.puntos += int(producto.costo / 2) 
         usuario.save()
-        renta = Renta(id_libro=producto, id_deudor=user, fecha_prestamo=timezone.now())
+        renta = Renta(id_producto=producto, id_deudor=user, fecha_prestamo=timezone.now())
         renta.save()
         messages.success(request, 'Producto rentado exitosamente.')
         return redirect('productos')
