@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block titulo %} Lista de Productos {% endblock %}
 {% block contenido %} 
-<<div class="card">
+<div class="card mt-4">
     <div class="card-header">
         <a
             name=""
@@ -11,6 +11,12 @@
             role="button"
             >Agregar nuevo producto</a
         >
+        <a 
+            name="" 
+            id="" 
+            class="btn btn-success" 
+            href="{% url 'rentas_activas'%}" 
+            role="button">Devolver Productos</a>
         
     </div>
     <div class="card-body">

@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block titulo %} Devolver Productos {% endblock %}
+{% block contenido %}
+{% if not usuario %}
+<a name="" id="" class="btn btn-success" href="{% url 'rentas_activas' nocuenta=987654321%}" role="button">Devolver Productos</a>
+{% else %}
+    <a name="" id="" class="btn btn-success" href="{% url 'rentas_activas' nocuenta=987654321%}" role="button">Devolver
+        Productos</a>
+    <div class="card-body bg-info text-white">
+        <h4 class="card-title">Rentas Activas de {{usuario}}</h4>
+        <div class="table-responsive m-0">
+            <table class="table table-bordered table-info m-0">
+                <thead>
+                    <tr class="">
+                        <th scope="col">Producto</th>
+                        <th scope="col">Fecha de Prestamo</th>
+                        <th scope="col">Fecha de Devolución Esperada</th>
+                        <th scope="col">Devolver</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if not rentas_activas %}
+                    <tr class="">
+                        <td scope="row"> ... </td>
+                        <td> ... </td>
+                        <td>...</td>
+                        <td>...</td>
+                    </tr>
+                    {% endif %}
+                    {% for producto in rentas_activas %}
+    
+                    <tr class="">
+                        <td scope="row"> {{producto.renta.id_producto.nombre}} </td>
+                        <td>{{producto.renta.fecha_prestamo}}</td>
+                        <td>{{producto.fecha_devolucion_esperada}}</td>
+                        <td><a name="" id="" class="btn btn-success" href="{% url 'devolver' nocuenta=usuario id=producto.renta.id %}" role="button">Devolver Producto</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endif %}
+
+{% endblock %}
