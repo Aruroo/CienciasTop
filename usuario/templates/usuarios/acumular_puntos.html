@@ -10,6 +10,7 @@
             {% csrf_token %}
             {{ form.as_p|safe }}
             <button type="submit" class="btn btn-primary">Registrar puntos</button>
+            <a href="{% url 'usuarios' %}" class="btn btn-secondary">Regresar</a>
         </form>
 
         {% if messages %}
