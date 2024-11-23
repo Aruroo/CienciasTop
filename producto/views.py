@@ -5,6 +5,8 @@ from usuario.models import Usuario
 from .forms import ProductoForm, EditarProductoForm
 from .models import Producto, Renta
 from django.contrib import messages
+from django.db.models import Q
+
 
 # Group Check Functions
 def is_user_c(user):
@@ -96,17 +98,20 @@ def admin_producto(request):
     is_usuario_c = request.user.groups.filter(name='usuario_c').exists()
     is_adminn = request.user.groups.filter(name='administrador').exists()
     is_prov = request.user.groups.filter(name='proveedor').exists()
+    keyword = request.GET.get('keyword', '')
 
     user = request.user
     if user.groups.filter(name='proveedor').exists():
-        productos = Producto.objects.filter(user=user)
+        productos = Producto.objects.filter( Q(user=user) & Q(nombre__icontains=keyword) ) if keyword else Producto.objects.filter(user=user)
     else:
-        productos = Producto.objects.all()
+        productos = Producto.objects.filter( Q(nombre__icontains=keyword) ) if keyword else Producto.objects.all()
+        
     return render(request, 'productos/index_admin.html', {
         'productos': productos,
         'is_usuario_c': is_usuario_c,
         'is_prov': is_prov,
-        'is_adminn': is_adminn
+        'is_adminn': is_adminn,
+        'keyword': keyword
     })
 
 @login_required
