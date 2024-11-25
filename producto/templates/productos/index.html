@@ -12,9 +12,26 @@
 {% endif %} 
 <div class="card">
     <div class="card-header">
+        <!-- Contenedor de la barra de búsqueda -->
+        <div class="mb-3"> <!-- Añadido margen inferior -->
+            <form method="GET" action="{% url 'productos' %}" class="form-search">
+                <div class="input-group" style="width: 18rem;">
+                    <input type="text" name="search" value="{{ request.GET.search|default_if_none:'' }}" 
+                           class="form-control" placeholder="Buscar producto...">
+                    <button type="submit" class="btn btn-light border">
+                        <i class="fa fa-search text-secondary"></i> <!-- Lupa con color gris -->
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Contenedor del título -->
+        <div class="d-flex align-items-center">
+            <h4 class="card-title mb-0">Productos</h4>
+        </div>
+    </div>
     </div>
     <div class="card-body">
-        <h4 class="card-title">Productos</h4>
         <div class="row">
             {% for producto in productos %}
                 <div class="col-md-4 mb-4">
@@ -23,6 +40,7 @@
                         <div class="card-body">
                             <h5 class="card-title">{{ producto.nombre }}</h5>
                             <p class="card-text">
+                                <strong>ID:</strong> {{ producto.id }}<br>
                                 <strong>Categoria:</strong> {{ producto.categoria }}<br>
                                 <strong>Descripción:</strong> {{ producto.descripcion }}<br>
                                 <strong>Proveedor:</strong> {{ producto.user }}<br>

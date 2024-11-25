@@ -1,7 +1,0 @@
-virt/
-*.pyc
-.DS_Store
-*.swp
-.vscode/
-__pycache__/
-productos_imagenes/

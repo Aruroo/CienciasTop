@@ -71,6 +71,15 @@ def productos(request):
     """
     productos_rentados = Renta.objects.all()
     productos = Producto.objects.exclude(rentas__in=productos_rentados)
+
+    # Obtener el término de búsqueda
+    search_query = request.GET.get('search', '').strip()
+    if search_query:
+        productos = productos.filter(
+            Q(id__icontains=search_query) | Q(nombre__icontains=search_query) | Q(categoria__icontains=search_query)
+
+        )
+
     
     is_usuario_c = request.user.groups.filter(name='usuario_c').exists()
     is_adminn = request.user.groups.filter(name='administrador').exists()
@@ -80,7 +89,9 @@ def productos(request):
         'productos': productos,
         'is_usuario_c': is_usuario_c,
         'is_prov': is_prov,
-        'is_adminn': is_adminn
+        'is_adminn': is_adminn,
+        'search_query': search_query
+
     })
 
 @login_required

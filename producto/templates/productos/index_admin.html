@@ -11,17 +11,19 @@
 				class="btn btn-success"
 				href="{% url 'crear' %}"
 				role="button"
-				>Agregar nuevo producto</a>
+				>Agregar nuevo producto </a>
 			</div>
 			<div class="col-12 col-sm-3">
-				<form action="{% url 'admin_productos' %}" method="get" class="form-search">
-					<div class="input-group">
-						<input type="text" name="keyword" value="{{ keyword }}" class="form-control" placeholder="Buscar producto..." />
-						<button type="button"><i class="fa fa-search"></i></button>
-					</div>
-					
-				</form>
-			</div>
+                <form action="{% url 'admin_productos' %}" method="get" class="form-search">
+                    <div class="input-group">
+                        <input type="text" name="keyword" value="{{ keyword }}" class="form-control" placeholder="Buscar producto..." />
+                        <!-- Cambiado el atributo 'type' -->
+                        <button type="submit" class="btn btn-light border">
+                            <i class="fa fa-search text-secondary"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
 			<div class="col-12 col-sm-3">
 			</div>
 		</div>
