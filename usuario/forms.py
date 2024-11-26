@@ -48,6 +48,18 @@ class UserRegistrationForm(forms.ModelForm):
         model = Usuario
         fields = ['nombre', 'apellidopaterno', 'apellidomaterno', 'celular', 'nocuenta', 'area', 'email', 'password1', 'password2']
 
+    # se agrega el método clean_email para validar que sea un correo de la institucion
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        # Validar que el correo contenga la palabra "institucional"
+        #if "institucional" not in email:
+        #   raise ValidationError("El correo debe contener la palabra 'institucional'.")
+        # Validar que el correo termine con el dominio específico
+        if not email.endswith('@ciencias.unam.mx'):
+            raise ValidationError("El correo debe tener el dominio '@ciencias.unam.mx'.")
+        return email
+    
+
     def clean_password2(self):
         # Validación de las contraseñas
         password1 = self.cleaned_data.get('password1')

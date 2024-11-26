@@ -80,6 +80,8 @@ def productos(request):
 
         )
 
+    no_productos = productos.count() == 0  # Verifica si no hay productos    
+
     
     is_usuario_c = request.user.groups.filter(name='usuario_c').exists()
     is_adminn = request.user.groups.filter(name='administrador').exists()
@@ -90,7 +92,8 @@ def productos(request):
         'is_usuario_c': is_usuario_c,
         'is_prov': is_prov,
         'is_adminn': is_adminn,
-        'search_query': search_query
+        'search_query': search_query,
+        'no_productos': no_productos  # Pasa la variable al template
 
     })
 
@@ -106,23 +109,34 @@ def admin_producto(request):
     Returns:
         HttpResponse: Respuesta HTTP con la lista de productos para el administrador o proveedor.
     """
-    is_usuario_c = request.user.groups.filter(name='usuario_c').exists()
-    is_adminn = request.user.groups.filter(name='administrador').exists()
-    is_prov = request.user.groups.filter(name='proveedor').exists()
+   
     keyword = request.GET.get('keyword', '')
 
     user = request.user
     if user.groups.filter(name='proveedor').exists():
-        productos = Producto.objects.filter( Q(user=user) & Q(nombre__icontains=keyword) ) if keyword else Producto.objects.filter(user=user)
+        productos = Producto.objects.filter(
+            Q(user=user) & 
+            (Q(id__icontains=keyword) | Q(nombre__icontains=keyword) | Q(categoria__icontains=keyword))
+        ) if keyword else Producto.objects.filter(user=user)
     else:
-        productos = Producto.objects.filter( Q(nombre__icontains=keyword) ) if keyword else Producto.objects.all()
+        productos = Producto.objects.filter(
+            Q(id__icontains=keyword) | Q(nombre__icontains=keyword) | Q(categoria__icontains=keyword)
+        ) if keyword else Producto.objects.all()
         
+    no_productos = productos.count() == 0  # Verifica si no hay productos
+
+    # Verificar grupos del usuario
+    is_usuario_c = request.user.groups.filter(name='usuario_c').exists()
+    is_adminn = request.user.groups.filter(name='administrador').exists()
+    is_prov = request.user.groups.filter(name='proveedor').exists()
+
     return render(request, 'productos/index_admin.html', {
         'productos': productos,
         'is_usuario_c': is_usuario_c,
         'is_prov': is_prov,
         'is_adminn': is_adminn,
-        'keyword': keyword
+        'keyword': keyword,
+        'no_productos': no_productos  # Pasa la variable al template
     })
 
 @login_required
