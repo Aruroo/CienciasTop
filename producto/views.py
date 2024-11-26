@@ -213,27 +213,66 @@ def rentar_producto(request, id):
 @login_required
 @user_passes_test(is_admin)
 def rentas_activas_usuario(request, nocuenta=None):
-    try:
-        usuario = User.objects.get(username=nocuenta)
-    except User.DoesNotExist:
-        usuario = None
-    try:
-        rentas = Renta.objects.filter(id_deudor=usuario).filter(fecha_devuelto__isnull=True)
-    except Renta.DoesNotExist:
-        rentas = None
-        
-    rentas_activas = []
-    for renta in rentas:
-        objeto_rentado = renta.id_producto
-        fecha_devolucion_esperada = renta.fecha_prestamo + datetime.timedelta(days=objeto_rentado.dias)
-        rentas_activas.append({'renta':renta, 'fecha_devolucion_esperada':fecha_devolucion_esperada})
+    """
+    Permite al administrador ver las rentas activas de un usuario.
     
-    return render(request, 'productos/devolver.html', {'rentas_activas':rentas_activas, 'usuario':usuario})
+    Args:
+        request (HttpRequest): Objeto de la solicitud HTTP.
+        nocuenta (str): Número de cuenta del usuario cuyas rentas se visualizaran.
+    
+    Returns:
+        HttpResponse: Redirige a la vista de ventas activas del usuario.
+    """
+    if request.method == 'POST':
+        nocuenta_buscado = request.POST['nocuenta-buscado']
+        try:
+            usuario = User.objects.get(username=nocuenta_buscado)
+        except User.DoesNotExist:
+            usuario = None
+        try:
+            rentas = Renta.objects.filter(id_deudor=usuario).filter(fecha_devuelto__isnull=True)
+        except Renta.DoesNotExist:
+            rentas = None
+
+        rentas_activas = []
+        for renta in rentas:
+            objeto_rentado = renta.id_producto
+            fecha_devolucion_esperada = renta.fecha_prestamo + datetime.timedelta(days=objeto_rentado.dias)
+            rentas_activas.append({'renta':renta, 'fecha_devolucion_esperada':fecha_devolucion_esperada})
+
+        return render(request, 'productos/devolver.html', {'rentas_activas':rentas_activas, 'usuario':usuario})
+    else:
+        try:
+            usuario = User.objects.get(username=nocuenta)
+        except User.DoesNotExist:
+            usuario = None
+        try:
+            rentas = Renta.objects.filter(id_deudor=usuario).filter(fecha_devuelto__isnull=True)
+        except Renta.DoesNotExist:
+            rentas = None
+
+        rentas_activas = []
+        for renta in rentas:
+            objeto_rentado = renta.id_producto
+            fecha_devolucion_esperada = renta.fecha_prestamo + datetime.timedelta(days=objeto_rentado.dias)
+            rentas_activas.append({'renta':renta, 'fecha_devolucion_esperada':fecha_devolucion_esperada})
+            
+        return render(request, 'productos/devolver.html', {'rentas_activas':rentas_activas, 'usuario':usuario})
 
 @login_required
 @user_passes_test(is_admin)
 def devolver_producto(request, nocuenta, id):
-    #producto = Producto.objects.get(id=id)
+    """
+    Permite al administrador devolver una renta activa de un usuario.
+    
+    Args:
+        request (HttpRequest): Objeto de la solicitud HTTP.
+        nocuenta (str): Número de cuenta del usuario cuya renta se devolverá.
+        id (int): ID de la renta a devolver.
+    
+    Returns:
+        HttpResponse: Redirige a la vista de ventas activas del usuario.
+    """
     renta = Renta.objects.get(id=id)
     renta.fecha_devuelto = timezone.now()
     renta.save()

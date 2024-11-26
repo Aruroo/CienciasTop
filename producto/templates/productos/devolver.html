@@ -2,10 +2,36 @@
 {% block titulo %} Devolver Productos {% endblock %}
 {% block contenido %}
 {% if not usuario %}
-<a name="" id="" class="btn btn-success" href="{% url 'rentas_activas' nocuenta=987654321%}" role="button">Devolver Productos</a>
+<div class="m-4">
+    <form class="d-flex" method="post" action="{% url 'rentas_activas' %}">
+        {% csrf_token %}
+        <input class="form-control me-2" type="search" placeholder="Buscar usuario por NoCuenta o NoTrabajador"
+            aria-label="Search" name="nocuenta-buscado">
+        <button class="btn btn-info" type="submit">Buscar</button>
+    </form>
+</div>
+
+{% for message in messages %}
+<div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %}">
+    {{ message }}
+</div>
+{% endfor %}
+
 {% else %}
-    <a name="" id="" class="btn btn-success" href="{% url 'rentas_activas' nocuenta=987654321%}" role="button">Devolver
-        Productos</a>
+<div class="m-4">
+    <form class="d-flex" method="post" action="{% url 'rentas_activas' %}">
+        {% csrf_token %}
+        <input class="form-control me-2" type="search" placeholder="Buscar usuario por NoCuenta o NoTrabajador"
+            aria-label="Search" name="nocuenta-buscado">
+        <button class="btn btn-info" type="submit">Buscar</button>
+    </form>
+</div>
+
+{% for message in messages %}
+<div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %}">
+    {{ message }}
+</div>
+{% endfor %}
     <div class="card-body bg-info text-white">
         <h4 class="card-title">Rentas Activas de {{usuario}}</h4>
         <div class="table-responsive m-0">
@@ -33,7 +59,7 @@
                         <td scope="row"> {{producto.renta.id_producto.nombre}} </td>
                         <td>{{producto.renta.fecha_prestamo}}</td>
                         <td>{{producto.fecha_devolucion_esperada}}</td>
-                        <td><a name="" id="" class="btn btn-success" href="{% url 'devolver' nocuenta=usuario id=producto.renta.id %}" role="button">Devolver Producto</a></td>
+                        <td><a name="" id="" class="btn btn-success" href="{% url 'devolver' nocuenta=usuario id=producto.renta.id %}" role="button" onclick="return confirmarDevolucion('{{producto.renta.id_producto.nombre}}')">Devolver Producto</a></td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -41,5 +67,11 @@
         </div>
     </div>
 {% endif %}
+
+<script>
+    function confirmarDevolucion(nombre) {
+        return confirm(`¿Estás seguro de que deseas devolver el producto \"${nombre}\"?`);
+    }
+</script>
 
 {% endblock %}
