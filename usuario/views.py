@@ -229,8 +229,22 @@ def eliminar_usuario(request, nocuenta):
         HttpResponse: Redirige a la vista de usuarios.
     """
     usuario = Usuario.objects.get(nocuenta=nocuenta)
-    usuario.oculto = True
-    usuario.save()
+    usuario_django = User.objects.get(username=nocuenta)
+    usuario_ha_rentado = Renta.objects.filter(id_deudor=usuario_django)
+    rentas_activas = Renta.objects.filter(id_deudor=usuario_django).filter(fecha_devuelto__isnull=True)
+    
+    if usuario_ha_rentado:     
+        if not rentas_activas:
+            usuario.oculto = True
+            usuario.save()
+            messages.success(request, f'Se ha eliminado el usuario {nocuenta}.')
+        else:
+            messages.warning(request, f'No se puede eliminar al usuario deudor {nocuenta}.')
+    else:
+        usuario.oculto = True
+        usuario.save()
+        messages.success(request, f'Se ha eliminado el usuario {nocuenta}.')
+        
     return redirect('usuarios')
 
 def acumular_puntos(request, nocuenta):
