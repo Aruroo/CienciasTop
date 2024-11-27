@@ -243,8 +243,22 @@ def eliminar_usuario(request, nocuenta):
         HttpResponse: Redirige a la vista de usuarios.
     """
     usuario = Usuario.objects.get(nocuenta=nocuenta)
-    usuario.oculto = True
-    usuario.save()
+    usuario_django = User.objects.get(username=nocuenta)
+    usuario_ha_rentado = Renta.objects.filter(id_deudor=usuario_django)
+    rentas_activas = Renta.objects.filter(id_deudor=usuario_django).filter(fecha_devuelto__isnull=True)
+    
+    if usuario_ha_rentado:     
+        if not rentas_activas:
+            usuario.oculto = True
+            usuario.save()
+            messages.success(request, f'Se ha eliminado el usuario {nocuenta}.')
+        else:
+            messages.warning(request, f'No se puede eliminar al usuario deudor {nocuenta}.')
+    else:
+        usuario.oculto = True
+        usuario.save()
+        messages.success(request, f'Se ha eliminado el usuario {nocuenta}.')
+        
     return redirect('usuarios')
 
 def acumular_puntos(request, nocuenta):
@@ -276,15 +290,32 @@ def perfil(request):
     usuario_actual = request.user
     usuario = Usuario.objects.get(user=usuario_actual)
     try:
-        rentas = Renta.objects.filter(id_deudor=usuario_actual)
+        rentas = Renta.objects.filter(id_deudor=usuario_actual).filter(fecha_devuelto__isnull=True)
     except Renta.DoesNotExist:
         rentas = None
         
     rentas_activas = []
+
     for renta in rentas:
         objeto_rentado = renta.id_producto
         fecha_devolucion = renta.fecha_prestamo + dt.timedelta(days=objeto_rentado.dias)
         rentas_activas.append({'renta':renta, 'fecha_devolucion':fecha_devolucion})
+        
+    hoy = datetime.now()
+    puntos_del_mes = 0
+    try:
+        rentas_historicas = Renta.objects.filter(id_deudor=usuario_actual)
+    except Renta.DoesNotExist:
+        rentas = None
+    
+    for renta in rentas_historicas:
+        objeto_rentado = renta.id_producto
+        if renta.fecha_prestamo.month == hoy.month:
+            puntos_del_mes += int(objeto_rentado.costo / 2) 
+    
+    acumulaciones_del_mes = Acumulacion.objects.filter(usuario=usuario).filter(fecha__year=hoy.year, fecha__month=hoy.month)
+    for acumulacion in acumulaciones_del_mes:
+        puntos_del_mes+=acumulacion.puntos
     
     if len(usuario.nocuenta) == 9:
         es_estudiante = True
@@ -302,6 +333,7 @@ def perfil(request):
 
     return render(request, 'usuarios/perfil.html', 
                   {'usuario':usuario, 
+                   'puntos_del_mes':puntos_del_mes,
                    'es_estudiante':es_estudiante, 
                    'es_proveedor':es_proveedor,
                    'rentas_activas':rentas_activas,
