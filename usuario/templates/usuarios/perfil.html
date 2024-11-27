@@ -7,10 +7,10 @@
         <table class="table bg-info">
             <thead>
                 <tr>
-                    <th scope="col">Datos:</th>
-                    <th scope="col"></th>
+                    <th scope="col" class="col-2">Datos:</th>
+                    <th scope="col" class="col-2"></th>
                     {% if not es_proveedor %}
-                    <th scope="col">Productos Rentados Actualmente</th>
+                    <th scope="col" class="col-5">Productos Rentados Actualmente</th>
                     {% endif %}
                 </tr>
             </thead>
@@ -42,7 +42,7 @@
                                             {% for producto in rentas_activas %}
                                             
                                             <tr class="">
-                                                <td scope="row"> {{producto.renta.id_libro}} </td>
+                                                <td scope="row"> {{producto.renta.id_producto}} </td>
                                                 <td>{{producto.renta.fecha_prestamo}}</td>
                                                 <td>{{producto.fecha_devolucion}}</td>
                                             </tr>
@@ -60,20 +60,22 @@
                 </tr>
                 <tr class="">
                     {% if es_estudiante %}
-                    <td scope="row" class="col-2">No. Cuenta: </td>
+                    <td scope="row" >No. Cuenta: </td>
                     {% else %}
-                    <td scope="row" class="col-2">No. Trabajador: </td>
+                    <td scope="row" >No. Trabajador: </td>
                     {% endif %}
                     <td scope="row">{{usuario.nocuenta}}</td>
                 </tr>
+                {% if not es_proveedor %}
                 <tr class="">
                     <td scope="row">Puma Puntos Totales: </td>
                     <td scope="row">{{usuario.puntos}}</td>
                 </tr>
                 <tr class="">
                     <td scope="row">Puma Puntos del Mes: </td>
-                    <td scope="row"></td>
+                    <td scope="row">{{puntos_del_mes}}</td>
                 </tr>
+                {% endif %}
                 <tr class="">
                     <td scope="row">No. Celular: </td>
                     <td scope="row">{{usuario.celular}}</td>

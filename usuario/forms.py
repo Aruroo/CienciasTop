@@ -19,8 +19,8 @@ class UserRegistrationForm(forms.ModelForm):
     nombre = forms.CharField(label='Nombre', max_length=40)
     apellidopaterno = forms.CharField(label='Apellido paterno', max_length=40)
     apellidomaterno = forms.CharField(label='Apellido materno', max_length=40)
-    celular = PhoneNumberField(label='Número de teléfono')
-    nocuenta = forms.CharField(label='Número de Cuenta', max_length=9)
+    celular = PhoneNumberField(label='Número de teléfono (Con lada y clave internacional, +52 para México)')
+    nocuenta = forms.IntegerField(label='Número de Cuenta')
 
     AREA_CHOICES = [
         ('actuaria', 'Actuaría'),
@@ -47,6 +47,18 @@ class UserRegistrationForm(forms.ModelForm):
     class Meta:
         model = Usuario
         fields = ['nombre', 'apellidopaterno', 'apellidomaterno', 'celular', 'nocuenta', 'area', 'email', 'password1', 'password2']
+
+    # se agrega el método clean_email para validar que sea un correo de la institucion
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        # Validar que el correo contenga la palabra "institucional"
+        #if "institucional" not in email:
+        #   raise ValidationError("El correo debe contener la palabra 'institucional'.")
+        # Validar que el correo termine con el dominio específico
+        if not email.endswith('@ciencias.unam.mx'):
+            raise ValidationError("El correo debe tener el dominio '@ciencias.unam.mx'.")
+        return email
+    
 
     def clean_password2(self):
         # Validación de las contraseñas
@@ -79,10 +91,11 @@ class UserRegistrationForm(forms.ModelForm):
         nocuenta = self.cleaned_data.get('nocuenta')
         mensaje = "El número de cuenta debe ser de 6 dígitos para trabajadores o de 9 dígitos para alumnos."
         # Verifica que nocuenta solo contenga dígitos
-        if not nocuenta.isdigit():
-            raise ValidationError(mensaje)
+        # if not nocuenta.isdigit():
+        #     raise ValidationError(mensaje)
         # Verifica que nocuenta tenga una longitud válida
-        if len(nocuenta) not in [6, 9]:
+        len_nocuenta = len(str(nocuenta))
+        if len_nocuenta not in [6, 9]:
             raise ValidationError(mensaje)
         return nocuenta
 
@@ -98,15 +111,16 @@ class UserRegistrationForm(forms.ModelForm):
             raise ValidationError("El campo 'Área' solo debe estar seleccionado cuando el tipo de usuario es 'usuario'.")
     
         if nocuenta is None:
-            raise ValidationError("El campo 'Número de Cuenta' debe de ser un número entero.")
+            raise ValidationError("Número de Cuenta debe ser de 6 o 9 dígitos.")
 
         # Si nocuenta tiene 6 dígitos, 'Área' debe ser 'trabajador'
-        if len(nocuenta) == 6 and area != 'trabajador':
+        len_nocuenta = len(str(nocuenta))
+        if len_nocuenta == 6 and area != 'trabajador':
             if not tipousuario in ['administrador', 'proveedor']:    
                 raise ValidationError("Si el número de cuenta es de 6 dígitos, el área debe ser 'trabajador'.")
     
         # Si nocuenta tiene 9 dígitos, 'Área' no debe ser 'trabajador'
-        if len(nocuenta) == 9 and area == 'trabajador':
+        if len_nocuenta == 9 and area == 'trabajador':
             raise ValidationError("Si el número de cuenta es de 9 dígitos, el área no debe ser 'trabajador'.")
         
         return cleaned_data

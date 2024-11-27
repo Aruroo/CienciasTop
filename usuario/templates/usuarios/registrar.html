@@ -1,4 +1,4 @@
-{% extends 'usuarios/esqueleto.html' %}
+{% extends 'base.html' %}
 {% block titulo %} Registro {% endblock %}
 
 {% block contenido %}
@@ -20,6 +20,9 @@
             {% endfor %}
         </ul>
         {% endif %}
+
+        <!-- Botón regresar -->
+        <a href="{% url 'usuarios' %}" class="btn btn-secondary mt-3">Regresar</a>
     </div>
     <div class="card-footer text-muted"></div>
 </div>

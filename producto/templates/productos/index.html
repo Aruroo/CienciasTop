@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
+
 {% block titulo %} Lista de Productos {% endblock %}
+
 {% block contenido %}
 {% if messages %}
 <div class="messages">
@@ -12,35 +14,90 @@
 {% endif %} 
 <div class="card">
     <div class="card-header">
-    </div>
-    <div class="card-body">
-        <h4 class="card-title">Productos</h4>
-        <div class="row">
-            {% for producto in productos %}
-                <div class="col-md-4 mb-4">
-                    <div class="card h-100">
-                        <img src="{{ producto.imagen.url }}" class="card-img-top" alt="{{ producto.nombre }}" style="height: 200px; object-fit: cover;">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ producto.nombre }}</h5>
-                            <p class="card-text">
-                                <strong>Categoria:</strong> {{ producto.categoria }}<br>
-                                <strong>Descripción:</strong> {{ producto.descripcion }}<br>
-                                <strong>Proveedor:</strong> {{ producto.user }}<br>
-                                <strong>Costo:</strong> ${{ producto.costo }}<br>
-                                <strong>Días de Renta:</strong> {{ producto.dias }}
-                            </p>
-                        </div>
-                        <div class="card-footer">
-                            {% if not is_prov %}
-                                <a href="{% url 'rentar' producto.id %}" class="btn btn-success">Rentar</a>
-                            {% endif %}
-                        </div>
-                    </div>
+        <!-- Contenedor de la barra de búsqueda -->
+        <div class="mb-3"> <!-- Añadido margen inferior -->
+            <form method="GET" action="{% url 'productos' %}" class="form-search">
+                <div class="input-group" style="width: 18rem;">
+                    <input type="text" name="search" value="{{ request.GET.search|default_if_none:'' }}" 
+                           class="form-control" placeholder="Buscar producto...">
+                    <button type="submit" class="btn btn-light border">
+                        <i class="fa fa-search text-secondary"></i> <!-- Lupa con color gris -->
+                    </button>
                 </div>
-            {% endfor %}
+            </form>
+        </div>
+        
+        <!-- Contenedor del título -->
+        <div class="d-flex align-items-center">
+            <h4 class="card-title mb-0">Productos</h4>
         </div>
     </div>
+    
+    <div class="card-body">
+        <div class="row">
+            {% if productos %}
+                {% for producto in productos %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <img src="{{ producto.imagen.url }}" class="card-img-top" alt="{{ producto.nombre }}" style="height: 200px; object-fit: cover;">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ producto.nombre }}</h5>
+                                <p class="card-text">
+                                    <strong>ID:</strong> {{ producto.id }}<br>
+                                    <strong>Categoria:</strong> {{ producto.categoria }}<br>
+                                    <strong>Descripción:</strong> {{ producto.descripcion }}<br>
+                                    <strong>Proveedor:</strong> {{ producto.user }}<br>
+                                    <strong>Costo:</strong> {{ producto.costo }}<br>
+                                    <strong>Días de Renta:</strong> {{ producto.dias }}
+                                </p>
+                            </div>
+                            <div class="card-footer">
+                                {% if not is_prov %}
+                                    <a href="{% url 'rentar' producto.id %}" class="btn btn-success">Rentar</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12">
+                    <p class="text-center">No se encontraron productos que coincidan con tu búsqueda.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
     <div class="card-footer text-muted">Footer</div>
 </div>
 
+<!-- Modal de advertencia cuando no se encuentren productos -->
+<div class="modal fade" id="noResultsModal" tabindex="-1" aria-labelledby="noResultsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="noResultsModalLabel">No se encontraron productos</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                No se encontraron productos que coincidan con tu búsqueda. Por favor, prueba con otra palabra clave.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{% if not productos %}
+        <script>
+            $(document).ready(function(){
+                $('#noResultsModal').modal('show');
+            });
+        </script>
+    {% endif %}s
 {% endblock %}

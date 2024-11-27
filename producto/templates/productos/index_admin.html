@@ -1,77 +1,104 @@
 {% extends 'base.html' %}
+
 {% block titulo %} Lista de Productos {% endblock %}
-{% block contenido %} 
-<<div class="card">
+
+{% block contenido %}
+<div class="card mt-4">
     <div class="card-header">
-        <a
-            name=""
-            id=""
-            class="btn btn-success"
-            href="{% url 'crear' %}"
-            role="button"
-            >Agregar nuevo producto</a
-        >
-        
+        <div class="row">
+            <!-- Botón para agregar producto -->
+            <div class="col-12 col-sm-3">
+                <a
+                    name=""
+                    id=""
+                    class="btn btn-success"
+                    href="{% url 'crear' %}"
+                    role="button"
+                    >Agregar nuevo producto</a>
+            </div>
+            <!-- Botón para devolución de productos -->
+             {% if is_adminn %}
+            <div class="col-12 col-sm-3">
+                <a
+                    name=""
+                    id=""
+                    class="btn btn-success"
+                    href="{% url 'rentas_activas' %}"
+                    role="button"
+                    >Devolver Productos</a>
+            </div>
+            {% endif %}
+            <!-- Formulario de búsqueda -->
+            <div class="col-12 col-sm-3">
+                <form action="{% url 'admin_productos' %}" method="get" class="form-search">
+                    <div class="input-group">
+                        <input type="text" name="keyword" value="{{ keyword }}" class="form-control" placeholder="Buscar producto..." />
+                        <button type="submit" class="btn btn-light border">
+                            <i class="fa fa-search text-secondary"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
+
     <div class="card-body">
         <h4 class="card-title">Productos</h4>
-        <div
-            class="table-responsive"
-        >
-            <table
-                class="table table-primary"
-            >
+        <div class="table-responsive">
+            <table class="table table-primary">
                 <thead>
                     <tr>
                         <th scope="col">ID</th>
                         <th scope="col">Nombre</th>
                         <th scope="col">Categoria</th>
                         <th scope="col">Imagen</th>
-                        <th scope="col">Descripción </th>
-                        <th scope="col">Costo </th>
-                        <th scope="col">Días de Renta </th>
+                        <th scope="col">Descripción</th>
+                        <th scope="col">Costo</th>
+                        <th scope="col">Días de Renta</th>
                         <th scope="col">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for producto in productos %}
-                        
+                    {% if productos %}
+                        {% for producto in productos %}
                         <tr class="">
-                            <td scope="row"> {{producto.id}} </td>
-                            <td>{{producto.nombre}}</td>
-                            <td>{{producto.categoria}}</td>
+                            <td scope="row">{{ producto.id }}</td>
+                            <td>{{ producto.nombre }}</td>
+                            <td>{{ producto.categoria }}</td>
                             <td>
-                                <img src="{{producto.imagen.url}}" height="100">
+                                <img src="{{ producto.imagen.url }}" height="100">
                             </td>
-                            <td>{{producto.descripcion}}</td>
-                            
-                            <td>{{producto.costo}}</td>
-                            <td>{{producto.dias}}</td>
-                            <td> <a
-                                name=""
-                                id=""
-                                class="btn btn-info"
-                                href="{% url 'editar' producto.id %}"
-                                role="button"
-                                >Editar</a>
-                             | 
-                             <a
-                                name=""
-                                id=""
-                                class="btn btn-danger"
-                                href="{% url 'eliminar' producto.id %}"
-                                role="button"
-                                >Borrar</a>
-                            
+                            <td>{{ producto.descripcion }}</td>
+                            <td>{{ producto.costo }}</td>
+                            <td>{{ producto.dias }}</td>
+                            <td>
+                                <a class="btn btn-info" href="{% url 'editar' producto.id %}" role="button">Editar</a>
+                                |
+                                <a class="btn btn-danger" href="{% url 'eliminar' producto.id %}" role="button">Borrar</a>
+                            </td>
                         </tr>
-                        
-                    {% endfor %}
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center">No se encontraron productos para la búsqueda "{{ keyword }}"</td>
+                        </tr>
+                    {% endif %}
                 </tbody>
             </table>
         </div>
-        
     </div>
+
     <div class="card-footer text-muted">Footer</div>
 </div>
 
+{% endblock %}
+
+{% block scripts %}
+{% if not productos %}
+    <script>
+        $(document).ready(function() {
+            $('#noResultsModal').modal('show');
+        });
+    </script>
+{% endif %}
 {% endblock %}
