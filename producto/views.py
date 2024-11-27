@@ -222,8 +222,18 @@ def eliminar_producto(request, id):
     Returns:
         HttpResponse: Redirige a la vista de administración de productos.
     """
-    producto = Producto.objects.get(id=id)
-    producto.delete()
+    productos_rentados = Renta.objects.filter(fecha_devuelto__isnull=True)
+    productos = Producto.objects.exclude(rentas__in=productos_rentados)
+    try:
+            producto = productos.get(id=id)
+    except Producto.DoesNotExist:
+            producto = None
+    
+    if not producto:
+        messages.warning(request, "No puedes borrar productos rentados")
+    else:
+        producto.delete()
+        messages.success(request, "Producto Borrado")
     return redirect('admin_productos')
 
 @login_required
