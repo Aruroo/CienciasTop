@@ -242,6 +242,15 @@ def rentar_producto(request, id):
     user = request.user
     usuario = Usuario.objects.get(user=user)
     producto = Producto.objects.get(id=id)
+    # consultamos en la base de datos los productos que el
+    # usuario ha rentado en este mes
+    mes_actual = timezone.now().month
+    anio_actual = timezone.now().year
+    rentas_este_mes = Renta.objects.filter(id_deudor=user, fecha_prestamo__year= anio_actual, fecha_prestamo__month= mes_actual).count()
+
+    if rentas_este_mes >= 3:
+        messages.warning(request, 'Ya has alcanzado el limite de productos rentados este mes')
+        return redirect('productos')
 
     if usuario.puntos >= producto.costo:
         usuario.puntos -= producto.costo
