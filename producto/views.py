@@ -5,6 +5,8 @@ from usuario.models import Usuario
 from .forms import ProductoForm, EditarProductoForm
 from .models import Producto, Renta, User
 from django.contrib import messages
+from django.db.models import Q
+
 
 import datetime
 
@@ -74,8 +76,16 @@ def productos(request):
     """
     productos_rentados = Renta.objects.filter(fecha_devuelto__isnull=True)
     productos = Producto.objects.exclude(rentas__in=productos_rentados)
-    #productos = Producto.objects.exclude(rentas__in=productos_rentados)
-    
+
+    # Obtener el término de búsqueda
+    search_query = request.GET.get('search', '').strip()
+    if search_query:
+        productos = productos.filter(
+            Q(id__icontains=search_query) | Q(nombre__icontains=search_query) | Q(categoria__icontains=search_query)
+
+        )
+
+    no_productos = productos.count() == 0  # Verifica si no hay productos    
     is_usuario_c = request.user.groups.filter(name='usuario_c').exists()
     is_adminn = request.user.groups.filter(name='administrador').exists()
     is_prov = request.user.groups.filter(name='proveedor').exists()
@@ -84,7 +94,10 @@ def productos(request):
         'productos': productos,
         'is_usuario_c': is_usuario_c,
         'is_prov': is_prov,
-        'is_adminn': is_adminn
+        'is_adminn': is_adminn,
+        'search_query': search_query,
+        'no_productos': no_productos  # Pasa la variable al template
+
     })
 
 @login_required
@@ -99,20 +112,34 @@ def admin_producto(request):
     Returns:
         HttpResponse: Respuesta HTTP con la lista de productos para el administrador o proveedor.
     """
+   
+    keyword = request.GET.get('keyword', '')
+
+    user = request.user
+    if user.groups.filter(name='proveedor').exists():
+        productos = Producto.objects.filter(
+            Q(user=user) & 
+            (Q(id__icontains=keyword) | Q(nombre__icontains=keyword) | Q(categoria__icontains=keyword))
+        ) if keyword else Producto.objects.filter(user=user)
+    else:
+        productos = Producto.objects.filter(
+            Q(id__icontains=keyword) | Q(nombre__icontains=keyword) | Q(categoria__icontains=keyword)
+        ) if keyword else Producto.objects.all()
+        
+    no_productos = productos.count() == 0  # Verifica si no hay productos
+
+    # Verificar grupos del usuario
     is_usuario_c = request.user.groups.filter(name='usuario_c').exists()
     is_adminn = request.user.groups.filter(name='administrador').exists()
     is_prov = request.user.groups.filter(name='proveedor').exists()
 
-    user = request.user
-    if user.groups.filter(name='proveedor').exists():
-        productos = Producto.objects.filter(user=user)
-    else:
-        productos = Producto.objects.all()
     return render(request, 'productos/index_admin.html', {
         'productos': productos,
         'is_usuario_c': is_usuario_c,
         'is_prov': is_prov,
-        'is_adminn': is_adminn
+        'is_adminn': is_adminn,
+        'keyword': keyword,
+        'no_productos': no_productos  # Pasa la variable al template
     })
 
 @login_required
@@ -208,8 +235,7 @@ def rentar_producto(request, id):
     else:
         messages.error(request, 'No tienes suficientes puntos para rentar este producto.')
         return redirect('productos')
-    
-    
+  
 @login_required
 @user_passes_test(is_admin)
 def rentas_activas_usuario(request, nocuenta=None):
