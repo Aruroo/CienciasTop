@@ -127,6 +127,24 @@ def admin_producto(request):
         ) if keyword else Producto.objects.all()
         
     no_productos = productos.count() == 0  # Verifica si no hay productos
+    
+    try:
+        productos_rentados = Renta.objects.filter(fecha_devuelto__isnull=True)
+    except Renta.DoesNotExist:
+        productos_rentados = None
+    
+    #productos = Producto.objects.exclude(rentas__in=productos_rentados)
+    
+    datos_producto = []
+    for producto in productos:
+        try:
+            temp = productos_rentados.get(id_producto=producto)
+        except Renta.DoesNotExist:
+            temp = None
+        if not temp:
+            datos_producto.append({'producto': producto, 'rentado_e': 'Disponible'})
+        else:
+            datos_producto.append({'producto': producto, 'rentado_e': 'Rentado'})
 
     # Verificar grupos del usuario
     is_usuario_c = request.user.groups.filter(name='usuario_c').exists()
@@ -134,6 +152,7 @@ def admin_producto(request):
     is_prov = request.user.groups.filter(name='proveedor').exists()
 
     return render(request, 'productos/index_admin.html', {
+        'datos_producto': datos_producto,
         'productos': productos,
         'is_usuario_c': is_usuario_c,
         'is_prov': is_prov,
