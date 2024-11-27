@@ -72,7 +72,7 @@
                             <td>
                                 <a class="btn btn-info" href="{% url 'editar' producto.id %}" role="button">Editar</a>
                                 |
-                                <a class="btn btn-danger" href="#" data-toggle="modal" data-target="#deleteModal" data-producto-id="{{ producto.id }}" role="button">Borrar</a>
+                                <a class="btn btn-danger" href="{% url 'eliminar' producto.id %}" role="button">Borrar</a>
                             </td>
                         </tr>
                         {% endfor %}
