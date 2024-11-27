@@ -19,7 +19,7 @@ class UserRegistrationForm(forms.ModelForm):
     nombre = forms.CharField(label='Nombre', max_length=40)
     apellidopaterno = forms.CharField(label='Apellido paterno', max_length=40)
     apellidomaterno = forms.CharField(label='Apellido materno', max_length=40)
-    celular = PhoneNumberField(label='Número de teléfono')
+    celular = PhoneNumberField(label='Número de teléfono (Con lada y clave internacional, +52 para México)')
     nocuenta = forms.CharField(label='Número de Cuenta', max_length=9)
 
     AREA_CHOICES = [
