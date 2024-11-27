@@ -203,11 +203,14 @@ def editar_usuario(request, nocuenta):
     """
     usuario = get_object_or_404(Usuario, nocuenta=nocuenta)
     user = usuario.user
+    area = usuario.area
 
     if request.method == 'POST':
         formulario = UserEditForm(request.POST, instance=usuario)
         if formulario.is_valid():
             formulario.save()
+            usuario.area = area
+            usuario.save()
             if request.POST.get('toggleTipousuario') == '1':
                 nuevo_tipousuario = formulario.cleaned_data.get('tipousuario')
                 grupo_actual = user.groups.first().name if user.groups.exists() else None
