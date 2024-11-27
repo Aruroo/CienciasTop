@@ -1,6 +1,7 @@
 # Ignorar el entorno virtual
 venv/
 env/
+virt/
 
 # Ignorar archivos de configuración locales y claves sensibles
 *.env
