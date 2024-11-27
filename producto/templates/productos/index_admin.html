@@ -17,6 +17,7 @@
                     >Agregar nuevo producto</a>
             </div>
             <!-- Botón para devolución de productos -->
+             {% if is_adminn %}
             <div class="col-12 col-sm-3">
                 <a
                     name=""
@@ -26,6 +27,7 @@
                     role="button"
                     >Devolver Productos</a>
             </div>
+            {% endif %}
             <!-- Formulario de búsqueda -->
             <div class="col-12 col-sm-3">
                 <form action="{% url 'admin_productos' %}" method="get" class="form-search">

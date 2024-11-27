@@ -20,7 +20,7 @@ class UserRegistrationForm(forms.ModelForm):
     apellidopaterno = forms.CharField(label='Apellido paterno', max_length=40)
     apellidomaterno = forms.CharField(label='Apellido materno', max_length=40)
     celular = PhoneNumberField(label='Número de teléfono (Con lada y clave internacional, +52 para México)')
-    nocuenta = forms.CharField(label='Número de Cuenta', max_length=9)
+    nocuenta = forms.IntegerField(label='Número de Cuenta')
 
     AREA_CHOICES = [
         ('actuaria', 'Actuaría'),
@@ -91,10 +91,11 @@ class UserRegistrationForm(forms.ModelForm):
         nocuenta = self.cleaned_data.get('nocuenta')
         mensaje = "El número de cuenta debe ser de 6 dígitos para trabajadores o de 9 dígitos para alumnos."
         # Verifica que nocuenta solo contenga dígitos
-        if not nocuenta.isdigit():
-            raise ValidationError(mensaje)
+        # if not nocuenta.isdigit():
+        #     raise ValidationError(mensaje)
         # Verifica que nocuenta tenga una longitud válida
-        if len(nocuenta) not in [6, 9]:
+        len_nocuenta = len(str(nocuenta))
+        if len_nocuenta not in [6, 9]:
             raise ValidationError(mensaje)
         return nocuenta
 
@@ -110,15 +111,16 @@ class UserRegistrationForm(forms.ModelForm):
             raise ValidationError("El campo 'Área' solo debe estar seleccionado cuando el tipo de usuario es 'usuario'.")
     
         if nocuenta is None:
-            raise ValidationError("El campo 'Número de Cuenta' debe de ser un número entero.")
+            raise ValidationError("Número de Cuenta debe ser de 6 o 9 dígitos.")
 
         # Si nocuenta tiene 6 dígitos, 'Área' debe ser 'trabajador'
-        if len(nocuenta) == 6 and area != 'trabajador':
+        len_nocuenta = len(str(nocuenta))
+        if len_nocuenta == 6 and area != 'trabajador':
             if not tipousuario in ['administrador', 'proveedor']:    
                 raise ValidationError("Si el número de cuenta es de 6 dígitos, el área debe ser 'trabajador'.")
     
         # Si nocuenta tiene 9 dígitos, 'Área' no debe ser 'trabajador'
-        if len(nocuenta) == 9 and area == 'trabajador':
+        if len_nocuenta == 9 and area == 'trabajador':
             raise ValidationError("Si el número de cuenta es de 9 dígitos, el área no debe ser 'trabajador'.")
         
         return cleaned_data
