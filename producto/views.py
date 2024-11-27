@@ -163,7 +163,17 @@ def agregar_producto(request):
             return redirect('admin_productos')
     else:
         form = ProductoForm()
-    return render(request, 'agregar_producto.html', {'form': form})
+        
+    # Verificar grupos del usuario
+    is_usuario_c = request.user.groups.filter(name='usuario_c').exists()
+    is_adminn = request.user.groups.filter(name='administrador').exists()
+    is_prov = request.user.groups.filter(name='proveedor').exists()
+    
+    return render(request, 'agregar_producto.html', {
+        'form': form, 
+        'is_usuario_c': is_usuario_c,
+        'is_prov': is_prov,
+        'is_adminn': is_adminn})
 
 @login_required
 @user_passes_test(is_prov_or_admin)
@@ -187,8 +197,17 @@ def editar_producto(request, id):
             return redirect('admin_productos')
     else:
         form = EditarProductoForm(instance=producto)
+    
+    # Verificar grupos del usuario
+    is_usuario_c = request.user.groups.filter(name='usuario_c').exists()
+    is_adminn = request.user.groups.filter(name='administrador').exists()
+    is_prov = request.user.groups.filter(name='proveedor').exists()
 
-    return render(request, 'editar_producto.html', {'form': form})
+    return render(request, 'editar_producto.html', {
+        'form': form, 
+        'is_usuario_c': is_usuario_c,
+        'is_prov': is_prov,
+        'is_adminn': is_adminn})
 
 @login_required
 @user_passes_test(is_prov_or_admin)
@@ -233,7 +252,7 @@ def rentar_producto(request, id):
         messages.success(request, 'Producto rentado exitosamente.')
         return redirect('productos')
     else:
-        messages.error(request, 'No tienes suficientes puntos para rentar este producto.')
+        messages.warning(request, 'No tienes suficientes puntos para rentar este producto.')
         return redirect('productos')
   
 @login_required
