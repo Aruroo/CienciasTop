@@ -3,18 +3,30 @@
 {% block titulo %} Lista de Productos {% endblock %}
 
 {% block contenido %}
-<div class="card">
+<div class="card mt-4">
     <div class="card-header">
         <div class="row">
+            <!-- Botón para agregar producto -->
             <div class="col-12 col-sm-3">
-                 <a
-                name=""
-                id=""
-                class="btn btn-success"
-                href="{% url 'crear' %}"
-                role="button"
-                >Agregar nuevo producto </a>
+                <a
+                    name=""
+                    id=""
+                    class="btn btn-success"
+                    href="{% url 'crear' %}"
+                    role="button"
+                    >Agregar nuevo producto</a>
             </div>
+            <!-- Botón para devolución de productos -->
+            <div class="col-12 col-sm-3">
+                <a
+                    name=""
+                    id=""
+                    class="btn btn-success"
+                    href="{% url 'rentas_activas' %}"
+                    role="button"
+                    >Devolver Productos</a>
+            </div>
+            <!-- Formulario de búsqueda -->
             <div class="col-12 col-sm-3">
                 <form action="{% url 'admin_productos' %}" method="get" class="form-search">
                     <div class="input-group">
@@ -24,8 +36,6 @@
                         </button>
                     </div>
                 </form>
-            </div>
-            <div class="col-12 col-sm-3">
             </div>
         </div>
     </div>
@@ -40,9 +50,9 @@
                         <th scope="col">Nombre</th>
                         <th scope="col">Categoria</th>
                         <th scope="col">Imagen</th>
-                        <th scope="col">Descripción </th>
-                        <th scope="col">Costo </th>
-                        <th scope="col">Días de Renta </th>
+                        <th scope="col">Descripción</th>
+                        <th scope="col">Costo</th>
+                        <th scope="col">Días de Renta</th>
                         <th scope="col">Acciones</th>
                     </tr>
                 </thead>
@@ -50,7 +60,7 @@
                     {% if productos %}
                         {% for producto in productos %}
                         <tr class="">
-                            <td scope="row"> {{ producto.id }} </td>
+                            <td scope="row">{{ producto.id }}</td>
                             <td>{{ producto.nombre }}</td>
                             <td>{{ producto.categoria }}</td>
                             <td>
@@ -61,8 +71,8 @@
                             <td>{{ producto.dias }}</td>
                             <td>
                                 <a class="btn btn-info" href="{% url 'editar' producto.id %}" role="button">Editar</a>
-                                 | 
-                                 <a class="btn btn-danger" href="#" data-toggle="modal" data-target="#deleteModal" data-producto-id="{{ producto.id }}" role="button">Borrar</a>
+                                |
+                                <a class="btn btn-danger" href="#" data-toggle="modal" data-target="#deleteModal" data-producto-id="{{ producto.id }}" role="button">Borrar</a>
                             </td>
                         </tr>
                         {% endfor %}
@@ -79,34 +89,14 @@
     <div class="card-footer text-muted">Footer</div>
 </div>
 
-<!-- Modal de advertencia cuando no se encuentren productos -->
-<div class="modal fade" id="noResultsModal" tabindex="-1" aria-labelledby="noResultsModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="noResultsModalLabel">No se encontraron productos</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                No se encontraron productos que coincidan con tu búsqueda. Por favor, prueba con otra palabra clave.
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 {% endblock %}
 
 {% block scripts %}
 {% if not productos %}
-        <script>
-            $(document).ready(function(){
-                $('#noResultsModal').modal('show');
-            });
-        </script>
-    {% endif %}
+    <script>
+        $(document).ready(function() {
+            $('#noResultsModal').modal('show');
+        });
+    </script>
+{% endif %}
 {% endblock %}
