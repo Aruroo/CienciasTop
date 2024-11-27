@@ -1,19 +1,15 @@
-{% extends 'base.html' %}
-
-{% block titulo %} Lista de Productos {% endblock %}
-
 {% block contenido %}
-<div class="card">
+<div class="card mt-4">
     <div class="card-header">
         <div class="row">
             <div class="col-12 col-sm-3">
-                 <a
-                name=""
-                id=""
-                class="btn btn-success"
-                href="{% url 'crear' %}"
-                role="button"
-                >Agregar nuevo producto </a>
+                <a
+                    name=""
+                    id=""
+                    class="btn btn-success"
+                    href="{% url 'crear' %}"
+                    role="button"
+                >Agregar nuevo producto</a>
             </div>
             <div class="col-12 col-sm-3">
                 <form action="{% url 'admin_productos' %}" method="get" class="form-search">
@@ -26,6 +22,13 @@
                 </form>
             </div>
             <div class="col-12 col-sm-3">
+                <a
+                    name=""
+                    id=""
+                    class="btn btn-success"
+                    href="{% url 'rentas_activas' %}"
+                    role="button"
+                >Devolver Productos</a>
             </div>
         </div>
     </div>
@@ -38,11 +41,11 @@
                     <tr>
                         <th scope="col">ID</th>
                         <th scope="col">Nombre</th>
-                        <th scope="col">Categoria</th>
+                        <th scope="col">Categoría</th>
                         <th scope="col">Imagen</th>
-                        <th scope="col">Descripción </th>
-                        <th scope="col">Costo </th>
-                        <th scope="col">Días de Renta </th>
+                        <th scope="col">Descripción</th>
+                        <th scope="col">Costo</th>
+                        <th scope="col">Días de Renta</th>
                         <th scope="col">Acciones</th>
                     </tr>
                 </thead>
@@ -61,8 +64,8 @@
                             <td>{{ producto.dias }}</td>
                             <td>
                                 <a class="btn btn-info" href="{% url 'editar' producto.id %}" role="button">Editar</a>
-                                 | 
-                                 <a class="btn btn-danger" href="#" data-toggle="modal" data-target="#deleteModal" data-producto-id="{{ producto.id }}" role="button">Borrar</a>
+                                | 
+                                <a class="btn btn-danger" href="#" data-toggle="modal" data-target="#deleteModal" data-producto-id="{{ producto.id }}" role="button">Borrar</a>
                             </td>
                         </tr>
                         {% endfor %}
@@ -98,15 +101,4 @@
         </div>
     </div>
 </div>
-
-{% endblock %}
-
-{% block scripts %}
-{% if not productos %}
-        <script>
-            $(document).ready(function(){
-                $('#noResultsModal').modal('show');
-            });
-        </script>
-    {% endif %}
 {% endblock %}
