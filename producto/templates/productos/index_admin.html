@@ -64,30 +64,32 @@
                         <th scope="col">Descripción</th>
                         <th scope="col">Costo</th>
                         <th scope="col">Días de Renta</th>
+                        <th scope="col">Rentado?</th>
                         <th scope="col">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% if productos %}
-                        {% for producto in productos %}
+                        {% for producto in datos_producto %}
                         <tr class="">
-                            <td scope="row">{{ producto.id }}</td>
-                            <td>{{ producto.nombre }}</td>
-                            <td>{{ producto.categoria }}</td>
+                            <td scope="row">{{ producto.producto.id }}</td>
+                            <td>{{ producto.producto.nombre }}</td>
+                            <td>{{ producto.producto.categoria }}</td>
                             <td>
-                                <img src="{{ producto.imagen.url }}" height="100">
+                                <img src="{{ producto.producto.imagen.url }}" height="100">
                             </td>
-                            <td>{{ producto.descripcion }}</td>
-                            <td>{{ producto.costo }}</td>
-                            <td>{{ producto.dias }}</td>
+                            <td>{{ producto.producto.descripcion }}</td>
+                            <td>{{ producto.producto.costo }}</td>
+                            <td>{{ producto.producto.dias }}</td>
+                            <td>{{ producto.rentado_e }}</td>
                             <td>
-                                <a class="btn btn-info" href="{% url 'editar' producto.id %}" role="button">Editar</a>
+                                <a class="btn btn-info" href="{% url 'editar' producto.producto.id %}" role="button">Editar</a>
                                 |
                                 <a 
                                     class="btn btn-danger" 
-                                    href="{% url 'eliminar' producto.id %}" 
+                                    href="{% url 'eliminar' producto.producto.id %}" 
                                     role="button" 
-                                    onclick="return confirmarEliminacion('{{producto.nombre}}')">Borrar</a>
+                                    onclick="return confirmarEliminacion('{{producto.producto.nombre}}')">Borrar</a>
                             </td>
                         </tr>
                         {% endfor %}
