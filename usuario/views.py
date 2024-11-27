@@ -10,7 +10,7 @@ from .forms import UserEditForm, UserRegistrationForm, AcumularPuntosForm
 from .models import Usuario, Acumulacion
 from producto.models import Renta, Producto
 from datetime import datetime, timedelta, date
-from django.db.models import Count
+from django.db.models import Count, Q
 
 import datetime as dt
 
@@ -170,9 +170,23 @@ def usuarios(request):
     Returns:
         HttpResponse: Respuesta HTTP con la lista de usuarios no ocultos.
     """
+    keyword = request.GET.get('keyword', '')
+    
     usuario_actual = request.user
-    usuarios = Usuario.objects.filter(oculto=False).exclude(user=usuario_actual)
-    return render(request, 'usuarios/index.html', {'usuarios': usuarios})
+    usuarios = []
+    
+    if keyword:
+        print('KEYWORD', keyword)
+        usuarios = Usuario.objects.filter( 
+            Q(oculto=False) & 
+            ( Q(nombre__icontains=keyword) | Q(nocuenta__icontains=keyword) | Q(email__icontains=keyword) )
+        ).exclude(user=usuario_actual)
+    else:
+        usuarios = Usuario.objects.filter(oculto=False).exclude(user=usuario_actual)
+        
+    # print('QUERY', usuarios.query)
+    
+    return render(request, 'usuarios/index.html', {'usuarios': usuarios, 'keyword': keyword})
 
 @login_required
 @user_passes_test(is_admin)

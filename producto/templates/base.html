@@ -1,13 +1,14 @@
 	{% load static %}
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <style>
-    
         li:last-child {
             margin-left: auto;
         }
+        /* .form-search{} */
+        .form-search input{background:#ececec;}
+        .form-search button{border:0;padding:5px 12px;color:#bcbcbc;}
     </style>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -16,8 +17,9 @@
         
         {% endblock %}
     </title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-        rel="stylesheet" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.3/css/all.css" integrity="sha384-SZXxX4whJ79/gErwcOYf+zWLeJdY/qpuqC4cAa9rOGUstPomtqpuNWT9wdPEn2fk" crossorigin="anonymous" />
+    <link rel="stylesheet" href="{% static 'styles.css' %}" />
 </head>
 
 <body>
