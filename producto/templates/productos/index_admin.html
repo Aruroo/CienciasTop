@@ -3,6 +3,15 @@
 {% block titulo %} Lista de Productos {% endblock %}
 
 {% block contenido %}
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %}">
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
 <div class="card mt-4">
     <div class="card-header">
         <div class="row">
@@ -74,7 +83,11 @@
                             <td>
                                 <a class="btn btn-info" href="{% url 'editar' producto.id %}" role="button">Editar</a>
                                 |
-                                <a class="btn btn-danger" href="{% url 'eliminar' producto.id %}" role="button">Borrar</a>
+                                <a 
+                                    class="btn btn-danger" 
+                                    href="{% url 'eliminar' producto.id %}" 
+                                    role="button" 
+                                    onclick="return confirmarEliminacion('{{producto.nombre}}')">Borrar</a>
                             </td>
                         </tr>
                         {% endfor %}
@@ -88,8 +101,14 @@
         </div>
     </div>
 
-    <div class="card-footer text-muted">Footer</div>
+    <div class="card-footer text-muted"></div>
 </div>
+
+<script>
+    function confirmarEliminacion(producto) {
+        return confirm(`¿Estás seguro de que deseas devolver el producto \"${producto}\"?`);
+    }
+</script>
 
 {% endblock %}
 
@@ -99,6 +118,10 @@
         $(document).ready(function() {
             $('#noResultsModal').modal('show');
         });
+
+        function confirmarEliminacion() {
+                return confirm("¿Estás seguro de que deseas eliminar este usuario?");
+            }
     </script>
 {% endif %}
 {% endblock %}
